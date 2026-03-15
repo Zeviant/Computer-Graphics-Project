@@ -30,16 +30,12 @@ public class PlayerController : MonoBehaviour
     {
         HandleJumpBuffer();
         HandleJumpCut();
-    }
 
-    void FixedUpdate() 
-    {
         ApplyGravity();
         HandleMovement();
         HandleJump();
         controller.Move(playerVelocity * Time.deltaTime);
     }
-    
     private void HandleMovement()
     {
         float x = Input.GetAxisRaw("Horizontal");
@@ -73,7 +69,7 @@ public class PlayerController : MonoBehaviour
         }
         else 
         {
-            playerVelocity.y = playerVelocity.y - 9.8f * Time.fixedDeltaTime;
+            playerVelocity.y = playerVelocity.y - 9.8f * Time.deltaTime;
         }
     }
 
