@@ -2091,12 +2091,13 @@ MonoBehaviour:
   turnSmoothTime: 0.1
   jumpSpeed: 7
   jumpBuffer: 0.2
-  jumpCutMultiplier: 0.4
+  jumpCutMultiplier: 1
   slideSpeed: 10
   slideDuration: 0.4
   slideJumpBoost: 1.3
   slideJumpMomentumDecay: 5
   bhopWindow: 0.15
+  airSteerStrength: 50
 --- !u!1 &1104490678
 GameObject:
   m_ObjectHideFlags: 0
