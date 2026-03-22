@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI velocityText;
 
     [Header("Movement")]
-    [SerializeField] private float movementSpeed = 4.0f;
+    [SerializeField] private float movementSpeed = 6.0f;
     [SerializeField] private float turnSmoothTime = 0.1f;
 
     [Header("Jump")]
@@ -26,15 +26,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("Slide")]
     [SerializeField] private float slideSpeed = 10f;
-    [SerializeField] private float slideDuration = 0.4f;
-    [SerializeField] private float slideJumpBoost = 1.3f;
+    [SerializeField] private float slideDuration = 0.5f;
+    [SerializeField] private float slideJumpBoost = 1.0f;
     [SerializeField] private float slideJumpMomentumDecay = 5f;
     private bool isSliding = false;
+    private bool isSlideJumping = false;
     private Vector3 slideVelocity = Vector3.zero;
     private Vector3 slideJumpMomentum = Vector3.zero;
 
     [Header("Bhop")]
-    [SerializeField] private float bhopWindow = 0.15f; 
+    [SerializeField] private float bhopWindow = 0.15f;
+    [SerializeField] private float airSteerStrength = 50f;
     private float landingTimer = 0f;
     private bool justLanded = false;
 
@@ -165,6 +167,7 @@ public class PlayerController : MonoBehaviour
 
             playerVelocity.y = -1f;
             isJumping = false;
+            isSlideJumping = false;
             animator.SetBool("isJumping", false);
             animator.SetBool("isGrounded", true);
             animator.SetBool("isFalling", false);
@@ -189,9 +192,8 @@ public class PlayerController : MonoBehaviour
                     slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
                 }
                 CancelSlide();
-
-                // Forces slide jump to be a short jump
-                playerVelocity.y = jumpSpeed * jumpCutMultiplier;
+                isSlideJumping = true;
+                playerVelocity.y = jumpSpeed / 2f;
             }
             else 
             {
@@ -215,6 +217,27 @@ public class PlayerController : MonoBehaviour
     {
         if (slideJumpMomentum.magnitude > 0.01f)
         {
+            // Read player input direction relative to camera
+            float x = Input.GetAxisRaw("Horizontal");
+            float z = Input.GetAxisRaw("Vertical");
+            Vector3 inputDir = new Vector3(x, 0f, z).normalized;
+
+            if (inputDir.magnitude > 0.1f)
+            {
+                float targetAngle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                Vector3 worldInputDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+
+                // Steer momentum direction toward input, preserve magnitude
+                float currentSpeed = slideJumpMomentum.magnitude;
+                Vector3 steered = Vector3.RotateTowards(
+                    slideJumpMomentum.normalized,
+                    worldInputDir,
+                    airSteerStrength * Mathf.Deg2Rad * Time.deltaTime,
+                    0f
+                );
+                slideJumpMomentum = steered * currentSpeed;
+            }
+
             playerVelocity.x += slideJumpMomentum.x;
             playerVelocity.z += slideJumpMomentum.z;
         }
@@ -235,7 +258,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJumpCut() 
     {
-        if(Input.GetKeyUp(KeyCode.Space) && isJumping && playerVelocity.y > 0f) 
+        if(Input.GetKeyUp(KeyCode.Space) && isJumping && !isSlideJumping && playerVelocity.y > 0f) 
         {
             playerVelocity.y = playerVelocity.y * jumpCutMultiplier;
         }
