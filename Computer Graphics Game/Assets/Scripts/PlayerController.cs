@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private bool isJumping = false;
     private float jumpBufferTimer = 0f;
 
+    private Animator animator;
+
     [Header("Slide")]
     [SerializeField] private float slideSpeed = 10f;
     [SerializeField] private float slideDuration = 0.5f;
@@ -45,7 +47,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        
+        animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -75,6 +77,7 @@ public class PlayerController : MonoBehaviour
             
             if (new Vector3(x, 0f, z).magnitude < 0.1f) 
             {
+
                 return;
             }
 
@@ -87,6 +90,7 @@ public class PlayerController : MonoBehaviour
 
         if (isSliding)
         {
+            animator.SetBool("isSliding", true);
             playerVelocity.x = slideVelocity.x;
             playerVelocity.z = slideVelocity.z;
         }
@@ -109,6 +113,7 @@ public class PlayerController : MonoBehaviour
         }
 
         isSliding = false;
+        animator.SetBool("isSliding", false);
     }
 
     private void CancelSlide() 
@@ -125,6 +130,7 @@ public class PlayerController : MonoBehaviour
 
         if(inputDir.magnitude >= 0.1f) 
         {
+            animator.SetBool("isRunning", true);
             float targetAngle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
@@ -136,6 +142,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            animator.SetBool("isRunning", false);
             playerVelocity.x = 0f;
             playerVelocity.z = 0f;
         }
@@ -161,11 +168,16 @@ public class PlayerController : MonoBehaviour
             playerVelocity.y = -1f;
             isJumping = false;
             isSlideJumping = false;
+            animator.SetBool("isJumping", false);
+            animator.SetBool("isGrounded", true);
+            animator.SetBool("isFalling", false);
         }
         else
         {
             justLanded = false;
             playerVelocity.y -= 9.8f * Time.deltaTime;
+            animator.SetBool("isGrounded", false);
+            animator.SetBool("isFalling", playerVelocity.y < 0f);
         }
     }
 
@@ -196,6 +208,7 @@ public class PlayerController : MonoBehaviour
 
             jumpBufferTimer = 0f;
             isJumping = true;
+            animator.SetBool("isJumping", true);
             landingTimer = bhopWindow + 1f;
         }
     }
