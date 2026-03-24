@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float turnSmoothTime = 0.1f;
 
     [Header("Jump")]
-    [SerializeField] private float jumpSpeed = 5.1f;
+    [SerializeField] private float jumpSpeed = 6.0f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float jumpCutMultiplier = 0.4f;
     private bool isJumping = false;
@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     [Header("Slide")]
     [SerializeField] private float slideSpeed = 10f;
     [SerializeField] private float slideDuration = 0.5f;
+    [SerializeField] private float slideJumpHeight = 4.0f;
     [SerializeField] private float slideJumpBoost = 1.0f;
     [SerializeField] private float slideJumpMomentumDecay = 5f;
     private bool isSliding = false;
@@ -39,6 +40,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float airSteerStrength = 50f;
     private float landingTimer = 0f;
     private bool justLanded = false;
+
+    [Header("Wall Jump")]
+    [SerializeField] private float wallJumpSpeed = 8f;
+    [SerializeField] private float wallJumpHeight = 5f;
+    [SerializeField] private float wallDetectDistance = 0.6f;
+    [SerializeField] private float wallJumpSteerLockTime = 0.6f;
+    [SerializeField] private float wallJumpCooldown = 0.3f;
+    [SerializeField] private LayerMask wallMask;
+    private bool isTouchingWall = false;
+    private float wallJumpLockTimer = 0f;
+    private float wallJumpCooldownTimer = 0f;
+    private Vector3 wallNormal = Vector3.zero;
+
+    [Header("Debug")]
+    [SerializeField] private bool debugMode = true;
+    [SerializeField] private bool showVelocityHUD = true;
 
     private float turnSmoothVelocity = 0f;
     private Vector3 playerVelocity = Vector3.zero;
@@ -56,71 +73,28 @@ public class PlayerController : MonoBehaviour
         HandleJumpCut();
         ApplyGravity();
 
-        if (!isSliding)
+        if (wallJumpLockTimer > 0f)
+            wallJumpLockTimer -= Time.deltaTime;
+
+        if (wallJumpCooldownTimer > 0f)
+            wallJumpCooldownTimer -= Time.deltaTime;
+
+        if (!isSliding && wallJumpLockTimer <= 0f)
             HandleMovement();
 
         HandleJump();
         HandleSlide();
         HandleSlideJumpMomentum();
+        CheckWall();
+        HandleWallJump();
 
-        velocityText.text = "Velocity:\n" + playerVelocity.magnitude;
+        if (debugMode)
+            HandleDebug();
 
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
-    private void HandleSlide()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && controller.isGrounded && !isSliding)
-        {
-            float x = Input.GetAxisRaw("Horizontal");
-            float z = Input.GetAxisRaw("Vertical");
-            
-            if (new Vector3(x, 0f, z).magnitude < 0.1f) 
-            {
-
-                return;
-            }
-
-            if (slideCoroutine != null)
-            {
-                StopCoroutine(slideCoroutine);
-            }
-            slideCoroutine = StartCoroutine(SlideDash());
-        }
-
-        if (isSliding)
-        {
-            animator.SetBool("isSliding", true);
-            playerVelocity.x = slideVelocity.x;
-            playerVelocity.z = slideVelocity.z;
-        }
-    }
-
-    private IEnumerator SlideDash() 
-    {
-        isSliding = true;
-
-        Vector3 SlideDir = transform.forward;
-        slideVelocity = SlideDir * slideSpeed;
-
-        float elapsed = 0f;
-        
-        while (elapsed < slideDuration && isSliding) 
-        {
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        isSliding = false;
-        animator.SetBool("isSliding", false);
-    }
-
-    private void CancelSlide() 
-    {
-        if (slideCoroutine != null) StopCoroutine(slideCoroutine);
-        isSliding = false;
-    }
+    // --- Movement ---
 
     private void HandleMovement()
     {
@@ -128,7 +102,7 @@ public class PlayerController : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical");
         Vector3 inputDir = new Vector3(x, 0f, z).normalized;
 
-        if(inputDir.magnitude >= 0.1f) 
+        if (inputDir.magnitude >= 0.1f)
         {
             animator.SetBool("isRunning", true);
             float targetAngle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
@@ -148,26 +122,70 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // --- Jump ---
+
+    private void HandleJump()
+    {
+        if (controller.isGrounded && jumpBufferTimer > 0f)
+        {
+            if (isSliding)
+                PerformSlideJump();
+            else
+                PerformJump();
+
+            jumpBufferTimer = 0f;
+            isJumping = true;
+            animator.SetBool("isJumping", true);
+            landingTimer = bhopWindow + 1f;
+        }
+    }
+
+    private void PerformJump()
+    {
+        playerVelocity.y = jumpSpeed;
+
+        if (!Input.GetKey(KeyCode.Space))
+            playerVelocity.y *= jumpCutMultiplier;
+    }
+
+    private void HandleJumpBuffer()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            jumpBufferTimer = jumpBuffer;
+
+        if (jumpBufferTimer > 0f)
+            jumpBufferTimer -= Time.deltaTime;
+    }
+
+    private void HandleJumpCut()
+    {
+        if (Input.GetKeyUp(KeyCode.Space) && isJumping && !isSlideJumping && playerVelocity.y > 0f)
+            playerVelocity.y *= jumpCutMultiplier;
+    }
+
+    // --- Gravity ---
+
     private void ApplyGravity()
     {
         if (controller.isGrounded)
         {
-            if (!justLanded) 
-            {
-                justLanded = true;
-                landingTimer = 0f;
-            }
+            if (!justLanded)
+                OnLand();
 
             landingTimer += Time.deltaTime;
 
-            if(landingTimer > bhopWindow) 
-            {
+            if (landingTimer > bhopWindow)
                 slideJumpMomentum = Vector3.zero;
-            }
 
             playerVelocity.y = -1f;
             isJumping = false;
             isSlideJumping = false;
+
+            // NOTE: upVelocity is intentionally set to fwdVelocity here — update if a
+            // separate vertical blend tree param is needed (e.g. playerVelocity.y).
+            var fwdVelocity = Vector3.Dot(controller.velocity, transform.forward);
+            animator.SetFloat("fwdVelocity", fwdVelocity);
+            animator.SetFloat("upVelocity", fwdVelocity);
             animator.SetBool("isJumping", false);
             animator.SetBool("isGrounded", true);
             animator.SetBool("isFalling", false);
@@ -181,43 +199,87 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleJump()
+    private void OnLand()
     {
-        if (controller.isGrounded && jumpBufferTimer > 0f)
+        justLanded = true;
+        landingTimer = 0f;
+    }
+
+    // --- Slide ---
+
+    private void HandleSlide()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && controller.isGrounded && !isSliding)
         {
-            if (isSliding)
-            {
-                if(slideJumpMomentum.magnitude <= 0.01f) 
-                {
-                    slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
-                }
-                CancelSlide();
-                isSlideJumping = true;
-                playerVelocity.y = jumpSpeed / 2f;
-            }
-            else 
-            {
-                playerVelocity.y = jumpSpeed;
+            float x = Input.GetAxisRaw("Horizontal");
+            float z = Input.GetAxisRaw("Vertical");
 
-                // Buffer short jump if player is no longer pressing jump
-                if (!Input.GetKey(KeyCode.Space)) 
-                {
-                    playerVelocity.y *= jumpCutMultiplier;
-                }
-            }
+            if (new Vector3(x, 0f, z).magnitude < 0.1f)
+                return;
 
-            jumpBufferTimer = 0f;
-            isJumping = true;
-            animator.SetBool("isJumping", true);
-            landingTimer = bhopWindow + 1f;
+            if (slideCoroutine != null)
+                StopCoroutine(slideCoroutine);
+
+            slideCoroutine = StartCoroutine(SlideDash());
+        }
+
+        if (isSliding)
+        {
+            animator.SetBool("isSliding", true);
+            playerVelocity.x = slideVelocity.x;
+            playerVelocity.z = slideVelocity.z;
         }
     }
+
+    private IEnumerator SlideDash()
+    {
+        PerformSlideStart();
+
+        float elapsed = 0f;
+        while (elapsed < slideDuration && isSliding)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        PerformSlideEnd();
+    }
+
+    private void PerformSlideStart()
+    {
+        isSliding = true;
+        slideVelocity = transform.forward * slideSpeed;
+    }
+
+    private void PerformSlideEnd()
+    {
+        isSliding = false;
+        animator.SetBool("isSliding", false);
+    }
+
+    private void PerformSlideJump()
+    {
+        if (slideJumpMomentum.magnitude <= 0.01f)
+            slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
+
+        CancelSlide();
+        isSlideJumping = true;
+        playerVelocity.y = slideJumpHeight;
+    }
+
+    private void CancelSlide()
+    {
+        if (slideCoroutine != null)
+            StopCoroutine(slideCoroutine);
+        isSliding = false;
+    }
+
+    // --- Slide Jump Momentum ---
 
     private void HandleSlideJumpMomentum()
     {
         if (slideJumpMomentum.magnitude > 0.01f)
         {
-            // Read player input direction relative to camera
             float x = Input.GetAxisRaw("Horizontal");
             float z = Input.GetAxisRaw("Vertical");
             Vector3 inputDir = new Vector3(x, 0f, z).normalized;
@@ -227,7 +289,6 @@ public class PlayerController : MonoBehaviour
                 float targetAngle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
                 Vector3 worldInputDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
 
-                // Steer momentum direction toward input, preserve magnitude
                 float currentSpeed = slideJumpMomentum.magnitude;
                 Vector3 steered = Vector3.RotateTowards(
                     slideJumpMomentum.normalized,
@@ -243,25 +304,78 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandleJumpBuffer()
-    {
-        if (Input.GetKeyDown(KeyCode.Space)) 
-        {
-            jumpBufferTimer = jumpBuffer;
-        }
+    // --- Wall Jump ---
 
-        if (jumpBufferTimer > 0f) 
+    private void CheckWall()
+    {
+        isTouchingWall = false;
+        wallNormal = Vector3.zero;
+
+        if (controller.isGrounded) return;
+        if (wallJumpCooldownTimer > 0f) return;
+
+        Vector3 origin = transform.position + Vector3.up * (controller.height / 2f);
+
+        if (Physics.SphereCast(origin, controller.radius, transform.forward, out RaycastHit hit, wallDetectDistance, wallMask))
         {
-            jumpBufferTimer = jumpBufferTimer - Time.deltaTime;
+            float facingDot = Vector3.Dot(transform.forward, hit.normal);
+            if (facingDot < -0.5f)
+            {
+                isTouchingWall = true;
+                wallNormal = hit.normal;
+            }
         }
     }
 
-    private void HandleJumpCut() 
+    private void HandleWallJump()
     {
-        if(Input.GetKeyUp(KeyCode.Space) && isJumping && !isSlideJumping && playerVelocity.y > 0f) 
-        {
-            playerVelocity.y = playerVelocity.y * jumpCutMultiplier;
-        }
+        if (!isTouchingWall) return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+            PerformWallJump();
     }
 
+    private void PerformWallJump()
+    {
+        wallJumpLockTimer = wallJumpSteerLockTime;
+        wallJumpCooldownTimer = wallJumpCooldown;
+
+        Vector3 horizontalNormal = new Vector3(wallNormal.x, 0f, wallNormal.z).normalized;
+        Vector3 wallJumpDir = (horizontalNormal + Vector3.up).normalized;
+
+        playerVelocity.x = wallJumpDir.x * wallJumpSpeed;
+        playerVelocity.z = wallJumpDir.z * wallJumpSpeed;
+        playerVelocity.y = wallJumpHeight;
+
+        transform.rotation = Quaternion.LookRotation(horizontalNormal);
+
+        isTouchingWall = false;
+        isJumping = true;
+        jumpBufferTimer = 0f;
+        animator.SetBool("isJumping", true);
+    }
+
+    // --- Debug ---
+
+    private void HandleDebug()
+    {
+        if (showVelocityHUD)
+        {
+            Vector3 horizontalVelocity = new Vector3(playerVelocity.x, 0f, playerVelocity.z);
+            velocityText.text = "Velocity:\n" + horizontalVelocity.magnitude;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            controller.enabled = false;
+            transform.position = new Vector3(0f, 10f, 0f);
+            controller.enabled = true;
+        }
+
+        Debug.DrawRay(
+            transform.position + Vector3.up * (controller.height / 2f),
+            transform.forward * wallDetectDistance,
+            isTouchingWall ? Color.green : Color.red
+        );
+    }
 }
