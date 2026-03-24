@@ -181,8 +181,6 @@ public class PlayerController : MonoBehaviour
             isJumping = false;
             isSlideJumping = false;
 
-            // NOTE: upVelocity is intentionally set to fwdVelocity here — update if a
-            // separate vertical blend tree param is needed (e.g. playerVelocity.y).
             var fwdVelocity = Vector3.Dot(controller.velocity, transform.forward);
             animator.SetFloat("fwdVelocity", fwdVelocity);
             animator.SetFloat("upVelocity", fwdVelocity);
