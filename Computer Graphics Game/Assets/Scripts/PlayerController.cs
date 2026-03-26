@@ -182,8 +182,9 @@ public class PlayerController : MonoBehaviour
             isSlideJumping = false;
 
             var fwdVelocity = Vector3.Dot(controller.velocity, transform.forward);
+            var upVelocity = Vector3.Dot(controller.velocity, transform.up);
             animator.SetFloat("fwdVelocity", fwdVelocity);
-            animator.SetFloat("upVelocity", fwdVelocity);
+            animator.SetFloat("upVelocity", upVelocity);
             animator.SetBool("isJumping", false);
             animator.SetBool("isGrounded", true);
             animator.SetBool("isFalling", false);
