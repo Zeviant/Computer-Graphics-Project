@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpSpeed = 6.0f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float jumpCutMultiplier = 0.4f;
+    [SerializeField] private float fallMultiplier = 2.5f;
     private bool isJumping = false;
     private float jumpBufferTimer = 0f;
 
@@ -29,7 +30,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float slideDuration = 0.5f;
     [SerializeField] private float slideJumpHeight = 4.0f;
     [SerializeField] private float slideJumpBoost = 1.0f;
-    [SerializeField] private float slideJumpMomentumDecay = 5f;
     private bool isSliding = false;
     private bool isSlideJumping = false;
     private Vector3 slideVelocity = Vector3.zero;
@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
+        Application.targetFrameRate = 60; // REMOVE LATER 
     }
 
     void Update()
@@ -192,7 +193,19 @@ public class PlayerController : MonoBehaviour
         else
         {
             justLanded = false;
-            playerVelocity.y -= 9.8f * Time.deltaTime;
+
+            float gravity = 0f;
+            if(playerVelocity.y < 0f) 
+            {
+                gravity = 10f * fallMultiplier;
+            }
+            else 
+            {
+                gravity = 10f;
+            }
+
+            playerVelocity.y -= gravity * Time.deltaTime;
+
             animator.SetBool("isGrounded", false);
             animator.SetBool("isFalling", playerVelocity.y < 0f);
         }
@@ -298,8 +311,8 @@ public class PlayerController : MonoBehaviour
                 slideJumpMomentum = steered * currentSpeed;
             }
 
-            playerVelocity.x += slideJumpMomentum.x;
-            playerVelocity.z += slideJumpMomentum.z;
+            playerVelocity.x = slideJumpMomentum.x;
+            playerVelocity.z = slideJumpMomentum.z;
         }
     }
 

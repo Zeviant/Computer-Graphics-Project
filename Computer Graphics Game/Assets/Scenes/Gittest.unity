@@ -3576,6 +3576,18 @@ PrefabInstance:
       propertyPath: velocityText
       value: 
       objectReference: {fileID: 919777660}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: movementSpeed
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: slideJumpBoost
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: turnSmoothTime
+      value: 0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 2939630109307430014, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: m_Name
       value: Player
