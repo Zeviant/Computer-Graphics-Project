@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float wallJumpSteerLockTime = 0.6f;
     [SerializeField] private float wallJumpCooldown = 0.3f;
     [SerializeField] private LayerMask wallMask;
+    private bool isWallJumping = false;
     private bool isTouchingWall = false;
     private float wallJumpLockTimer = 0f;
     private float wallJumpCooldownTimer = 0f;
@@ -160,8 +161,10 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJumpCut()
     {
-        if (Input.GetKeyUp(KeyCode.Space) && isJumping && !isSlideJumping && playerVelocity.y > 0f)
+        if (Input.GetKeyUp(KeyCode.Space) && isJumping && !isSlideJumping && !isWallJumping && playerVelocity.y > 0f) 
+        {
             playerVelocity.y *= jumpCutMultiplier;
+        }
     }
 
     // --- Gravity ---
@@ -171,15 +174,21 @@ public class PlayerController : MonoBehaviour
         if (controller.isGrounded)
         {
             if (!justLanded)
-                OnLand();
+            {
+                justLanded = true;
+                landingTimer = 0f;
+            }
 
             landingTimer += Time.deltaTime;
 
-            if (landingTimer > bhopWindow)
+            if (landingTimer > bhopWindow) 
+            {
                 slideJumpMomentum = Vector3.zero;
+            }
 
             playerVelocity.y = -1f;
             isJumping = false;
+            isWallJumping = false;
             isSlideJumping = false;
 
             var fwdVelocity = Vector3.Dot(controller.velocity, transform.forward);
@@ -209,12 +218,6 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isGrounded", false);
             animator.SetBool("isFalling", playerVelocity.y < 0f);
         }
-    }
-
-    private void OnLand()
-    {
-        justLanded = true;
-        landingTimer = 0f;
     }
 
     // --- Slide ---
@@ -365,6 +368,7 @@ public class PlayerController : MonoBehaviour
 
         isTouchingWall = false;
         isJumping = true;
+        isWallJumping = true;
         jumpBufferTimer = 0f;
         animator.SetBool("isJumping", true);
     }
