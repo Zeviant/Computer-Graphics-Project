@@ -313,7 +313,7 @@ public class PlayerController : MonoBehaviour
         if (controller.isGrounded) return;
         if (wallJumpCooldownTimer > 0f) return;
 
-        Vector3 origin = transform.position + Vector3.up * (controller.height / 2f);
+        Vector3 origin = transform.position + controller.center;
 
         if (Physics.SphereCast(origin, controller.radius, transform.forward, out RaycastHit hit, wallDetectDistance, wallMask))
         {
@@ -339,6 +339,8 @@ public class PlayerController : MonoBehaviour
         wallJumpLockTimer = wallJumpSteerLockTime;
         wallJumpCooldownTimer = wallJumpCooldown;
 
+        slideJumpMomentum = Vector3.zero; // clear slide jump momentum
+
         Vector3 horizontalNormal = new Vector3(wallNormal.x, 0f, wallNormal.z).normalized;
         Vector3 wallJumpDir = (horizontalNormal + Vector3.up).normalized;
 
@@ -353,7 +355,6 @@ public class PlayerController : MonoBehaviour
         jumpBufferTimer = 0f;
         animator.SetBool("isJumping", true);
     }
-
     // --- Debug ---
 
     private void HandleDebug()
@@ -372,7 +373,7 @@ public class PlayerController : MonoBehaviour
         }
 
         Debug.DrawRay(
-            transform.position + Vector3.up * (controller.height / 2f),
+            transform.position + controller.center,
             transform.forward * wallDetectDistance,
             isTouchingWall ? Color.green : Color.red
         );
