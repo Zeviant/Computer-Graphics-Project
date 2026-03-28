@@ -14,14 +14,20 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float movementSpeed = 6.0f;
     [SerializeField] private float turnSmoothTime = 0.1f;
+    [SerializeField] private float gravityVal = 10f;
 
     [Header("Jump")]
     [SerializeField] private float jumpSpeed = 6.0f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float jumpCutMultiplier = 0.4f;
     [SerializeField] private float fallMultiplier = 2.5f;
+    private bool isFixedHeightJump = false;
     private bool isJumping = false;
     private float jumpBufferTimer = 0f;
+
+    [Header("Double Jump")]
+    [SerializeField] private float doubleJumpSpeed = 6f;
+    private bool hasDoubleJump = false;
 
     private Animator animator;
 
@@ -31,7 +37,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float slideJumpHeight = 4.0f;
     [SerializeField] private float slideJumpBoost = 1.0f;
     private bool isSliding = false;
-    private bool isSlideJumping = false;
     private Vector3 slideVelocity = Vector3.zero;
     private Vector3 slideJumpMomentum = Vector3.zero;
 
@@ -47,8 +52,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float wallDetectDistance = 0.6f;
     [SerializeField] private float wallJumpSteerLockTime = 0.6f;
     [SerializeField] private float wallJumpCooldown = 0.3f;
+    [SerializeField] private float wallJumpBuffer = 0.15f;
+    private float wallJumpBufferTimer = 0f;
     [SerializeField] private LayerMask wallMask;
-    private bool isWallJumping = false;
     private bool isTouchingWall = false;
     private float wallJumpLockTimer = 0f;
     private float wallJumpCooldownTimer = 0f;
@@ -85,6 +91,7 @@ public class PlayerController : MonoBehaviour
             HandleMovement();
 
         HandleJump();
+        HandleDoubleJump();
         HandleSlide();
         HandleSlideJumpMomentum();
         CheckWall();
@@ -124,49 +131,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // --- Jump ---
-
-    private void HandleJump()
-    {
-        if (controller.isGrounded && jumpBufferTimer > 0f)
-        {
-            if (isSliding)
-                PerformSlideJump();
-            else
-                PerformJump();
-
-            jumpBufferTimer = 0f;
-            isJumping = true;
-            animator.SetBool("isJumping", true);
-            landingTimer = bhopWindow + 1f;
-        }
-    }
-
-    private void PerformJump()
-    {
-        playerVelocity.y = jumpSpeed;
-
-        if (!Input.GetKey(KeyCode.Space))
-            playerVelocity.y *= jumpCutMultiplier;
-    }
-
-    private void HandleJumpBuffer()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-            jumpBufferTimer = jumpBuffer;
-
-        if (jumpBufferTimer > 0f)
-            jumpBufferTimer -= Time.deltaTime;
-    }
-
-    private void HandleJumpCut()
-    {
-        if (Input.GetKeyUp(KeyCode.Space) && isJumping && !isSlideJumping && !isWallJumping && playerVelocity.y > 0f) 
-        {
-            playerVelocity.y *= jumpCutMultiplier;
-        }
-    }
-
     // --- Gravity ---
 
     private void ApplyGravity()
@@ -188,8 +152,9 @@ public class PlayerController : MonoBehaviour
 
             playerVelocity.y = -1f;
             isJumping = false;
-            isWallJumping = false;
-            isSlideJumping = false;
+            isFixedHeightJump = false;
+            hasDoubleJump = true;
+
 
             var fwdVelocity = Vector3.Dot(controller.velocity, transform.forward);
             var upVelocity = Vector3.Dot(controller.velocity, transform.up);
@@ -206,11 +171,11 @@ public class PlayerController : MonoBehaviour
             float gravity = 0f;
             if(playerVelocity.y < 0f) 
             {
-                gravity = 10f * fallMultiplier;
+                gravity = gravityVal * fallMultiplier;
             }
             else 
             {
-                gravity = 10f;
+                gravity = gravityVal;
             }
 
             playerVelocity.y -= gravity * Time.deltaTime;
@@ -218,6 +183,85 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isGrounded", false);
             animator.SetBool("isFalling", playerVelocity.y < 0f);
         }
+    }
+
+    // --- Jump ---
+
+    private void HandleJump()
+    {
+        if (controller.isGrounded && jumpBufferTimer > 0f)
+        {
+            if (isSliding) 
+            {
+                PerformSlideJump();
+            }
+            else 
+            {
+                PerformJump();
+            }
+
+            jumpBufferTimer = 0f;
+            isJumping = true;
+            animator.SetBool("isJumping", true);
+            landingTimer = bhopWindow + 1f;
+        }
+    }
+
+    private void PerformJump()
+    {
+        isFixedHeightJump = false;
+        playerVelocity.y = jumpSpeed;
+
+        if (!Input.GetKey(KeyCode.Space))
+        {
+            playerVelocity.y *= jumpCutMultiplier;
+        }
+    }
+
+    private void HandleJumpBuffer()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            jumpBufferTimer = jumpBuffer;
+
+        if (jumpBufferTimer > 0f)
+            jumpBufferTimer -= Time.deltaTime;
+    }
+
+    private void HandleJumpCut()
+    {
+        if (Input.GetKeyUp(KeyCode.Space) && isJumping && !isFixedHeightJump && playerVelocity.y > 0f)
+        {
+            playerVelocity.y *= jumpCutMultiplier;
+        }
+    }
+
+    // --- Double Jump ---
+
+    private void HandleDoubleJump()
+    {
+        if (controller.isGrounded) return;
+        if (!Input.GetKeyDown(KeyCode.Space)) return;
+        if (!hasDoubleJump) return;
+        if (IsNearGround()) return;
+
+        PerformDoubleJump();
+    }
+    private void PerformDoubleJump()
+    {
+        hasDoubleJump = false;
+
+        playerVelocity.y = doubleJumpSpeed;
+
+        isJumping = true;
+        isFixedHeightJump = true;
+        animator.SetBool("isJumping", true);
+    }
+    private bool IsNearGround()
+    {
+        // Claude generated formula for checking whether to double jump or to just let jump buffer handle the jump
+        float checkDistance = Mathf.Abs(playerVelocity.y) * jumpBuffer + controller.skinWidth;
+        Vector3 origin = transform.position + controller.center;
+        return Physics.SphereCast(origin, controller.radius, Vector3.down, out _, checkDistance);
     }
 
     // --- Slide ---
@@ -278,7 +322,7 @@ public class PlayerController : MonoBehaviour
             slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
 
         CancelSlide();
-        isSlideJumping = true;
+        isFixedHeightJump = true;
         playerVelocity.y = slideJumpHeight;
     }
 
@@ -344,10 +388,19 @@ public class PlayerController : MonoBehaviour
 
     private void HandleWallJump()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+            wallJumpBufferTimer = wallJumpBuffer;
+
+        if (wallJumpBufferTimer > 0f)
+            wallJumpBufferTimer -= Time.deltaTime;
+
         if (!isTouchingWall) return;
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (wallJumpBufferTimer > 0f)
+        {
+            wallJumpBufferTimer = 0f;
             PerformWallJump();
+        }
     }
 
     private void PerformWallJump()
@@ -368,7 +421,8 @@ public class PlayerController : MonoBehaviour
 
         isTouchingWall = false;
         isJumping = true;
-        isWallJumping = true;
+        isFixedHeightJump = true;
+        hasDoubleJump = true;
         jumpBufferTimer = 0f;
         animator.SetBool("isJumping", true);
     }
@@ -395,4 +449,5 @@ public class PlayerController : MonoBehaviour
             isTouchingWall ? Color.green : Color.red
         );
     }
+
 }
