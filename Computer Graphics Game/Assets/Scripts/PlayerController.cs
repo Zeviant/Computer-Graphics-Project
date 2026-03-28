@@ -15,12 +15,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float movementSpeed = 6.0f;
     [SerializeField] private float turnSmoothTime = 0.1f;
     [SerializeField] private float gravityVal = 10f;
+    [SerializeField] private float slopeStickForce = 8f;
 
     [Header("Jump")]
     [SerializeField] private float jumpSpeed = 6.0f;
     [SerializeField] private float jumpBuffer = 0.2f;
     [SerializeField] private float jumpCutMultiplier = 0.4f;
     [SerializeField] private float fallMultiplier = 2.5f;
+    [SerializeField] private float coyoteTime = 0.15f;
+    private float coyoteTimer = 0f;
     private bool isFixedHeightJump = false;
     private bool isJumping = false;
     private float jumpBufferTimer = 0f;
@@ -143,6 +146,7 @@ public class PlayerController : MonoBehaviour
                 landingTimer = 0f;
             }
 
+            coyoteTimer = coyoteTime;
             landingTimer += Time.deltaTime;
 
             if (landingTimer > bhopWindow) 
@@ -167,6 +171,7 @@ public class PlayerController : MonoBehaviour
         else
         {
             justLanded = false;
+            coyoteTimer = coyoteTimer - Time.deltaTime;
 
             float gravity = 0f;
             if(playerVelocity.y < 0f) 
@@ -189,7 +194,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJump()
     {
-        if (controller.isGrounded && jumpBufferTimer > 0f)
+        if (coyoteTimer > 0f && jumpBufferTimer > 0f)
         {
             if (isSliding) 
             {
@@ -240,6 +245,7 @@ public class PlayerController : MonoBehaviour
     private void HandleDoubleJump()
     {
         if (controller.isGrounded) return;
+        if (wallJumpLockTimer > 0f) return;
         if (!Input.GetKeyDown(KeyCode.Space)) return;
         if (!hasDoubleJump) return;
         if (IsNearGround()) return;
@@ -297,7 +303,7 @@ public class PlayerController : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < slideDuration && isSliding)
         {
-            elapsed += Time.deltaTime;
+            elapsed = elapsed + Time.deltaTime;
             yield return null;
         }
 
@@ -385,9 +391,14 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     private void HandleWallJump()
     {
+        if (controller.isGrounded)
+        {
+            wallJumpBufferTimer = 0f;
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
             wallJumpBufferTimer = wallJumpBuffer;
 
