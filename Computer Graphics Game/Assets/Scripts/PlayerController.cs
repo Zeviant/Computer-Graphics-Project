@@ -3,6 +3,7 @@ using System.Text;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class PlayerController : MonoBehaviour
 {
@@ -66,6 +67,14 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debugMode = true;
     [SerializeField] private bool showVelocityHUD = true;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip doubleJumpSound;
+    [SerializeField] private AudioClip slideSound;
+    [SerializeField] private AudioClip slideJumpSound;
+    [SerializeField] private AudioClip wallJumpSound;
 
     private float turnSmoothVelocity = 0f;
     private Vector3 playerVelocity = Vector3.zero;
@@ -214,12 +223,13 @@ public class PlayerController : MonoBehaviour
 
     private void PerformJump()
     {
+        audioSource.PlayOneShot(jumpSound, 0.85f);
         isFixedHeightJump = false;
         playerVelocity.y = jumpSpeed;
 
         if (!Input.GetKey(KeyCode.Space))
         {
-            playerVelocity.y *= jumpCutMultiplier;
+            playerVelocity.y = playerVelocity.y * jumpCutMultiplier;
         }
     }
 
@@ -254,10 +264,9 @@ public class PlayerController : MonoBehaviour
     }
     private void PerformDoubleJump()
     {
+        audioSource.PlayOneShot(doubleJumpSound);
         hasDoubleJump = false;
-
         playerVelocity.y = doubleJumpSpeed;
-
         isJumping = true;
         isFixedHeightJump = true;
         animator.SetBool("isJumping", true);
@@ -312,6 +321,7 @@ public class PlayerController : MonoBehaviour
 
     private void PerformSlideStart()
     {
+        audioSource.PlayOneShot(slideSound, 0.5f);
         isSliding = true;
         slideVelocity = transform.forward * slideSpeed;
     }
@@ -324,8 +334,11 @@ public class PlayerController : MonoBehaviour
 
     private void PerformSlideJump()
     {
-        if (slideJumpMomentum.magnitude <= 0.01f)
+        audioSource.PlayOneShot(slideJumpSound);
+        if (slideJumpMomentum.magnitude <= 0.01f) 
+        {
             slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
+        }
 
         CancelSlide();
         isFixedHeightJump = true;
@@ -416,6 +429,7 @@ public class PlayerController : MonoBehaviour
 
     private void PerformWallJump()
     {
+        audioSource.PlayOneShot(wallJumpSound, 0.7f);
         wallJumpLockTimer = wallJumpSteerLockTime;
         wallJumpCooldownTimer = wallJumpCooldown;
 
