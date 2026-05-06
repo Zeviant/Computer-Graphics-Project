@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     private bool isFixedHeightJump = false;
     private bool isJumping = false;
     private float jumpBufferTimer = 0f;
-
+    
     [Header("Double Jump")]
     [SerializeField] private float doubleJumpSpeed = 6f;
     private bool hasDoubleJump = false;
@@ -424,7 +424,7 @@ public class PlayerController : MonoBehaviour
 
     private void PerformWallJump()
     {
-        audioSource.PlayOneShot(wallJumpSound, 0.7f);
+        audioSource.PlayOneShot(wallJumpSound, 0.5f);
         wallJumpLockTimer = wallJumpSteerLockTime;
         wallJumpCooldownTimer = wallJumpCooldown;
 

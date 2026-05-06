@@ -51,28 +51,40 @@ MonoBehaviour:
   controller: {fileID: 3510089434488183823}
   cam: {fileID: 0}
   velocityText: {fileID: 0}
-  movementSpeed: 5
-  turnSmoothTime: 0.1
+  movementSpeed: 10
+  turnSmoothTime: 0.05
+  gravityVal: 11
+  slopeStickForce: 8
   jumpSpeed: 7
   jumpBuffer: 0.2
   jumpCutMultiplier: 0.5
-  slideSpeed: 10
+  fallMultiplier: 1.3
+  coyoteTime: 0.15
+  doubleJumpSpeed: 6
+  slideSpeed: 15
   slideDuration: 0.5
-  slideJumpHeight: 4
+  slideJumpHeight: 5
   slideJumpBoost: 1
-  slideJumpMomentumDecay: 5
+  isSliding: 0
   bhopWindow: 0.15
-  airSteerStrength: 50
-  wallJumpSpeed: 8
+  airSteerStrength: 180
+  wallJumpSpeed: 12
   wallJumpHeight: 8
-  wallDetectDistance: 0.6
-  wallJumpSteerLockTime: 0.6
-  wallJumpCooldown: 0.3
+  wallDetectDistance: 0.5
+  wallJumpSteerLockTime: 0.4
+  wallJumpCooldown: 0.1
+  wallJumpBuffer: 0.15
   wallMask:
     serializedVersion: 2
     m_Bits: 128
   debugMode: 1
   showVelocityHUD: 1
+  audioSource: {fileID: 0}
+  jumpSound: {fileID: 8300000, guid: 7824f639f63feaa4780dedc93ed436c3, type: 3}
+  doubleJumpSound: {fileID: 8300000, guid: 56972c59a34300a4497434bc181fa689, type: 3}
+  slideSound: {fileID: 8300000, guid: 24144183970ec654e9c81df465a2ef78, type: 3}
+  slideJumpSound: {fileID: 8300000, guid: 7824f639f63feaa4780dedc93ed436c3, type: 3}
+  wallJumpSound: {fileID: 8300000, guid: 59bd4011d47d0844db14bc939ccfeb54, type: 3}
 --- !u!143 &3510089434488183823
 CharacterController:
   m_ObjectHideFlags: 0
