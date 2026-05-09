@@ -34,7 +34,15 @@ public class MoveBetweenAB : MonoBehaviour
 
         if (Vector3.Distance(transform.position, target.position) < 0.05f)
         {
-            target = target == pointA ? pointB : pointA;
+            if (target == pointA)
+            {
+                target = pointB;
+            }
+            else
+            {
+                target = pointA;
+            }
+
             waitTimer = waitTime;
         }
     }
