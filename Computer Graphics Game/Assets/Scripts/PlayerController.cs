@@ -114,6 +114,9 @@ public class PlayerController : MonoBehaviour
         if (debugMode)
             HandleDebug();
 
+        if (controller == null || !controller.enabled)
+            return;
+
         controller.Move(playerVelocity * Time.deltaTime);
         UpdateAnimator();
     }
@@ -459,6 +462,25 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("isSliding", isSliding);
     }
 
+    // --- Helpers ---
+    public void ResetVelocity()
+    {
+        playerVelocity = Vector3.zero;
+        slideVelocity = Vector3.zero;
+        slideJumpMomentum = Vector3.zero;
+
+        isSliding = false;
+        isJumping = false;
+        isFixedHeightJump = false;
+
+        coyoteTimer = 0f;
+        jumpBufferTimer = 0f;
+        landingTimer = 0f;
+        wallJumpBufferTimer = 0f;
+        wallJumpLockTimer = 0f;
+        wallJumpCooldownTimer = 0f;
+    }
+
     // --- Debug ---
 
     private void HandleDebug()
@@ -471,9 +493,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            controller.enabled = false;
-            transform.position = new Vector3(0f, 10f, 0f);
-            controller.enabled = true;
+            CheckpointManager.Instance.Respawn(gameObject);
         }
 
         Debug.DrawRay(
