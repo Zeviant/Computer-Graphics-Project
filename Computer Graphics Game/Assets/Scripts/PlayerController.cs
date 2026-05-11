@@ -88,6 +88,8 @@ public class PlayerController : MonoBehaviour
     private float wallJumpLockTimer = 0f;
     private float wallJumpCooldownTimer = 0f;
     private float bhopCurrentSpeed = 0f;
+    private float externalLaunchTimer = 0f;
+    private const float ExternalLaunchGraceTime = 0.12f;
 
     private bool isJumping = false;
     private bool isFixedHeightJump = false;
@@ -188,6 +190,22 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyGravity()
     {
+        if (externalLaunchTimer > 0f)
+        {
+            externalLaunchTimer -= Time.deltaTime;
+            justLanded = false;
+            coyoteTimer = 0f;
+
+            float gravity = playerVelocity.y < 0f
+                ? gravityVal * fallMultiplier
+                : gravityVal;
+
+            playerVelocity.y -= gravity * Time.deltaTime;
+
+            wasGrounded = false;
+            return;
+        }
+
         if (controller.isGrounded)
         {
             HandleGroundedGravity();
@@ -751,6 +769,26 @@ public class PlayerController : MonoBehaviour
         lastJumpPressedTime = -999f;
         canBhopFromSlideJump = false;
         shouldSpawnJumpDustOnLanding = false;
+    }
+
+    public void Launch(Vector3 direction, float force)
+    {
+        direction = direction.normalized;
+
+        ClearBhopChain();
+
+        externalLaunchTimer = ExternalLaunchGraceTime;
+
+        playerVelocity.y = 0f;
+        playerVelocity += direction * force;
+
+        isJumping = true;
+        isFixedHeightJump = true;
+        justLanded = false;
+        coyoteTimer = 0f;
+        jumpBufferTimer = 0f;
+
+        shouldSpawnJumpDustOnLanding = true;
     }
 
     // --- Debug ---
