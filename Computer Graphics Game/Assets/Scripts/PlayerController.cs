@@ -31,6 +31,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float slideJumpHeight = 4.0f;
     [SerializeField] private float slideJumpBoost = 1.0f;
 
+    [Header("Moving Platform")]
+    [SerializeField] private LayerMask movingPlatformMask;
+    [SerializeField] private float movingPlatformCheckDistance = 0.35f;
+
     [Header("Bhop")]
     [SerializeField] private float bhopWindow = 0.15f;
     [SerializeField] private float airSteerStrength = 50f;
@@ -101,8 +105,10 @@ public class PlayerController : MonoBehaviour
     private bool canBhopFromSlideJump = false;
     private bool jumpWasBufferedBeforeLanding = false;
     private bool shouldSpawnJumpDustOnLanding = false;
+    private bool clearMomentumOnGround = false;
 
     private Coroutine slideCoroutine;
+    private MoveBetweenAB currentMovingPlatform;
 
     private void Start()
     {
@@ -132,6 +138,9 @@ public class PlayerController : MonoBehaviour
 
         if (controller == null || !controller.enabled)
             return;
+
+        UpdateMovingPlatform();
+        ApplyMovingPlatformMovement();
 
         controller.Move(playerVelocity * Time.deltaTime);
         UpdateAnimator();
@@ -186,6 +195,47 @@ public class PlayerController : MonoBehaviour
         playerVelocity.z = horizontalVelocity.z;
     }
 
+    // --- Moving Platform ---
+
+    private void UpdateMovingPlatform()
+    {
+        currentMovingPlatform = null;
+
+        if (!controller.isGrounded)
+            return;
+
+        Vector3 origin = transform.position + controller.center;
+        float radius = Mathf.Max(0.05f, controller.radius * 0.9f);
+
+        bool hitPlatform = Physics.SphereCast(
+            origin,
+            radius,
+            Vector3.down,
+            out RaycastHit hit,
+            movingPlatformCheckDistance + controller.height * 0.5f,
+            movingPlatformMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (!hitPlatform)
+            return;
+
+        currentMovingPlatform = hit.collider.GetComponentInParent<MoveBetweenAB>();
+    }
+
+    private void ApplyMovingPlatformMovement()
+    {
+        if (currentMovingPlatform == null)
+            return;
+
+        Vector3 platformDelta = currentMovingPlatform.DeltaMovement;
+
+        if (platformDelta.sqrMagnitude <= 0.000001f)
+            return;
+
+        controller.Move(platformDelta);
+    }
+
     // --- Gravity / Landing ---
 
     private void ApplyGravity()
@@ -222,6 +272,14 @@ public class PlayerController : MonoBehaviour
     {
         if (!justLanded)
             HandleLanding();
+
+        if (clearMomentumOnGround)
+        {
+            slideJumpMomentum = Vector3.zero;
+            clearMomentumOnGround = false;
+            canBhopFromSlideJump = false;
+            ClearBhopState();
+        }
 
         coyoteTimer = coyoteTime;
         landingTimer += Time.deltaTime;
@@ -410,11 +468,13 @@ public class PlayerController : MonoBehaviour
 
         ClearBhopState();
         canBhopFromSlideJump = false;
+        clearMomentumOnGround = false;
     }
 
     private void PerformSlideEnd()
     {
         isSliding = false;
+        slideCoroutine = null;
     }
 
     private void PerformSlideJump()
@@ -427,6 +487,7 @@ public class PlayerController : MonoBehaviour
             slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
 
         canBhopFromSlideJump = true;
+        clearMomentumOnGround = false;
 
         CancelSlide();
 
@@ -440,10 +501,11 @@ public class PlayerController : MonoBehaviour
         if (slideCoroutine != null)
             StopCoroutine(slideCoroutine);
 
+        slideCoroutine = null;
         isSliding = false;
     }
 
-    // --- Bhop ---
+    // --- Bhop / Slide Jump Momentum ---
 
     private bool CanPerformBhop()
     {
@@ -456,7 +518,12 @@ public class PlayerController : MonoBehaviour
         if (!canBhopFromSlideJump)
             return false;
 
-        return GetHorizontalMomentum(slideJumpMomentum).magnitude > 0.01f;
+        Vector3 horizontalMomentum = GetHorizontalMomentum(slideJumpMomentum);
+
+        if (horizontalMomentum.magnitude <= movementSpeed + 0.1f)
+            return false;
+
+        return true;
     }
 
     private void PerformBhopJump()
@@ -472,6 +539,7 @@ public class PlayerController : MonoBehaviour
         bhopCurrentSpeed = GetBhopSpeedFromTiming();
         isBhopActive = true;
         canBhopFromSlideJump = true;
+        clearMomentumOnGround = false;
 
         slideJumpMomentum = bhopDirection * bhopCurrentSpeed;
 
@@ -534,16 +602,14 @@ public class PlayerController : MonoBehaviour
         Vector3 currentDirection = slideJumpMomentum.normalized;
 
         if (isBhopActive && bhopDirection.magnitude > 0.01f)
-        {
             currentDirection = bhopDirection.normalized;
 
-            float turnAngle = Vector3.Angle(currentDirection, worldInputDir);
+        float turnAngle = Vector3.Angle(currentDirection, worldInputDir);
 
-            if (turnAngle >= bhopSharpTurnCancelAngle)
-            {
-                CancelBhopFromSharpTurn(worldInputDir);
-                return;
-            }
+        if (turnAngle >= bhopSharpTurnCancelAngle)
+        {
+            CancelMomentumFromSharpTurn(worldInputDir);
+            return;
         }
 
         float currentSpeed = isBhopActive
@@ -568,10 +634,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void CancelBhopFromSharpTurn(Vector3 desiredDirection)
+    private void CancelMomentumFromSharpTurn(Vector3 desiredDirection)
     {
         ClearBhopState();
         canBhopFromSlideJump = false;
+        clearMomentumOnGround = true;
 
         Vector3 flatDirection = GetHorizontalMomentum(desiredDirection).normalized;
 
@@ -580,6 +647,8 @@ public class PlayerController : MonoBehaviour
 
         slideJumpMomentum = flatDirection * movementSpeed;
         SetHorizontalVelocity(slideJumpMomentum);
+
+        transform.rotation = Quaternion.LookRotation(flatDirection);
     }
 
     private void ClearBhopChain()
@@ -587,6 +656,7 @@ public class PlayerController : MonoBehaviour
         slideJumpMomentum = Vector3.zero;
         ClearBhopState();
         canBhopFromSlideJump = false;
+        clearMomentumOnGround = false;
     }
 
     private void ClearBhopState()
@@ -677,6 +747,7 @@ public class PlayerController : MonoBehaviour
         slideJumpMomentum = Vector3.zero;
         ClearBhopState();
         canBhopFromSlideJump = false;
+        clearMomentumOnGround = false;
 
         Vector3 horizontalNormal = GetHorizontalMomentum(wallNormal).normalized;
         Vector3 wallJumpDir = (horizontalNormal + Vector3.up).normalized;
@@ -752,6 +823,11 @@ public class PlayerController : MonoBehaviour
         slideVelocity = Vector3.zero;
         slideJumpMomentum = Vector3.zero;
 
+        if (slideCoroutine != null)
+            StopCoroutine(slideCoroutine);
+
+        slideCoroutine = null;
+
         isSliding = false;
         isJumping = false;
         isFixedHeightJump = false;
@@ -763,12 +839,15 @@ public class PlayerController : MonoBehaviour
         wallJumpLockTimer = 0f;
         wallJumpCooldownTimer = 0f;
 
+        currentMovingPlatform = null;
+
         ClearBhopState();
 
         jumpWasBufferedBeforeLanding = false;
         lastJumpPressedTime = -999f;
         canBhopFromSlideJump = false;
         shouldSpawnJumpDustOnLanding = false;
+        clearMomentumOnGround = false;
     }
 
     public void Launch(Vector3 direction, float force)
