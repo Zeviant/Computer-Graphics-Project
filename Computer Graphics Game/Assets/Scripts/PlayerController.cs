@@ -49,6 +49,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump Effects")]
     [SerializeField] private ParticleSystem bhopLandingDust;
+    [SerializeField] private ParticleSystem doubleJumpEffect;
+    [SerializeField] private Vector3 doubleJumpEffectOffset = Vector3.zero;
     [SerializeField] private float dustGroundOffset = 0.03f;
 
     [Header("Wall Jump")]
@@ -398,6 +400,7 @@ public class PlayerController : MonoBehaviour
     private void PerformDoubleJump()
     {
         PlaySound(doubleJumpSound);
+        PlayDoubleJumpEffect();
 
         hasDoubleJump = false;
         playerVelocity.y = doubleJumpSpeed;
@@ -773,6 +776,28 @@ public class PlayerController : MonoBehaviour
     }
 
     // --- Effects ---
+
+    private void PlayDoubleJumpEffect()
+    {
+        if (doubleJumpEffect == null)
+            return;
+
+        Vector3 spawnPosition =
+            transform.position +
+            transform.right * doubleJumpEffectOffset.x +
+            Vector3.up * doubleJumpEffectOffset.y +
+            transform.forward * doubleJumpEffectOffset.z;
+
+        ParticleSystem effect = Instantiate(
+            doubleJumpEffect,
+            spawnPosition,
+            doubleJumpEffect.transform.rotation
+        );
+
+        effect.Play();
+
+        Destroy(effect.gameObject, 2f);
+    }
 
     private void PlayJumpLandingDust()
     {
