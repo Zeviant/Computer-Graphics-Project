@@ -129,11 +129,11 @@ public class PlayerController : MonoBehaviour
             HandleMovement();
 
         HandleJump();
+        CheckWall();
+        HandleWallJump();
         HandleDoubleJump();
         HandleSlide();
         HandleSlideJumpMomentum();
-        CheckWall();
-        HandleWallJump();
 
         if (debugMode)
             HandleDebug();
@@ -390,6 +390,7 @@ public class PlayerController : MonoBehaviour
     {
         if (controller.isGrounded) return;
         if (wallJumpLockTimer > 0f) return;
+        if (isTouchingWall) return;
         if (!Input.GetKeyDown(KeyCode.Space)) return;
         if (!hasDoubleJump) return;
         if (IsNearGround()) return;
