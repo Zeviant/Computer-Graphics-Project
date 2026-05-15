@@ -466,6 +466,8 @@ public class PlayerController : MonoBehaviour
         isSliding = true;
         slideVelocity = transform.forward * slideSpeed;
 
+        slideJumpMomentum = Vector3.zero;
+
         ClearBhopState();
         canBhopFromSlideJump = false;
         clearMomentumOnGround = false;
@@ -483,8 +485,12 @@ public class PlayerController : MonoBehaviour
 
         ClearBhopState();
 
-        if (slideJumpMomentum.magnitude <= 0.01f)
-            slideJumpMomentum = new Vector3(slideVelocity.x, 0f, slideVelocity.z) * slideJumpBoost;
+        Vector3 slideDirection = GetHorizontalMomentum(slideVelocity).normalized;
+
+        if (slideDirection.magnitude <= 0.01f)
+            slideDirection = transform.forward;
+
+        slideJumpMomentum = slideDirection * normalBhopSpeed;
 
         canBhopFromSlideJump = true;
         clearMomentumOnGround = false;
@@ -773,14 +779,20 @@ public class PlayerController : MonoBehaviour
         if (bhopLandingDust == null)
             return;
 
-        Vector3 spawnPosition = transform.position;
-        Quaternion spawnRotation = Quaternion.identity;
+        Vector3 rayOrigin = transform.position + Vector3.up * 0.5f;
+        float rayDistance = 2f;
 
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 2f))
-        {
-            spawnPosition = hit.point + hit.normal * dustGroundOffset;
-            spawnRotation = Quaternion.FromToRotation(Vector3.forward, hit.normal);
-        }
+        if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, rayDistance, ~0, QueryTriggerInteraction.Ignore))
+            return;
+
+        float groundAngle = Vector3.Angle(hit.normal, Vector3.up);
+
+        if (groundAngle > 50f)
+            return;
+
+        Vector3 spawnPosition = hit.point + Vector3.up * dustGroundOffset;
+
+        Quaternion spawnRotation = Quaternion.Euler(90f, 0f, 0f);
 
         ParticleSystem dust = Instantiate(bhopLandingDust, spawnPosition, spawnRotation);
         dust.Play();
