@@ -95,6 +95,7 @@ public class PlayerController : MonoBehaviour
     private float wallJumpCooldownTimer = 0f;
     private float bhopCurrentSpeed = 0f;
     private float externalLaunchTimer = 0f;
+
     private const float ExternalLaunchGraceTime = 0.12f;
 
     private bool isJumping = false;
@@ -109,6 +110,8 @@ public class PlayerController : MonoBehaviour
     private bool shouldSpawnJumpDustOnLanding = false;
     private bool clearMomentumOnGround = false;
 
+    private bool jumpConsumedThisFrame = false;
+
     private Coroutine slideCoroutine;
     private MoveBetweenAB currentMovingPlatform;
 
@@ -120,6 +123,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        jumpConsumedThisFrame = false;
+
         HandleJumpBuffer();
         HandleJumpCut();
         ApplyGravity();
@@ -342,6 +347,8 @@ public class PlayerController : MonoBehaviour
             PerformJump();
         }
 
+        jumpConsumedThisFrame = true;
+
         jumpBufferTimer = 0f;
         jumpWasBufferedBeforeLanding = false;
         isJumping = true;
@@ -388,6 +395,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandleDoubleJump()
     {
+        if (jumpConsumedThisFrame) return;
+
         if (controller.isGrounded) return;
         if (wallJumpLockTimer > 0f) return;
         if (isTouchingWall) return;
@@ -404,6 +413,8 @@ public class PlayerController : MonoBehaviour
         PlayDoubleJumpEffect();
 
         hasDoubleJump = false;
+        jumpConsumedThisFrame = true;
+
         playerVelocity.y = doubleJumpSpeed;
         isJumping = true;
         isFixedHeightJump = true;
@@ -725,6 +736,9 @@ public class PlayerController : MonoBehaviour
 
     private void HandleWallJump()
     {
+        if (jumpConsumedThisFrame)
+            return;
+
         if (controller.isGrounded)
         {
             wallJumpBufferTimer = 0f;
@@ -773,6 +787,7 @@ public class PlayerController : MonoBehaviour
         isFixedHeightJump = true;
         hasDoubleJump = true;
         jumpBufferTimer = 0f;
+        jumpConsumedThisFrame = true;
         shouldSpawnJumpDustOnLanding = true;
     }
 
@@ -854,10 +869,12 @@ public class PlayerController : MonoBehaviour
     }
 
     // --- Public Helpers ---
+
     public void RecoverDoubleJump()
     {
         hasDoubleJump = true;
     }
+
     public void ResetVelocity()
     {
         playerVelocity = Vector3.zero;
@@ -889,6 +906,7 @@ public class PlayerController : MonoBehaviour
         canBhopFromSlideJump = false;
         shouldSpawnJumpDustOnLanding = false;
         clearMomentumOnGround = false;
+        jumpConsumedThisFrame = false;
     }
 
     public void Launch(Vector3 direction, float force)
@@ -907,6 +925,7 @@ public class PlayerController : MonoBehaviour
         justLanded = false;
         coyoteTimer = 0f;
         jumpBufferTimer = 0f;
+        jumpConsumedThisFrame = true;
 
         shouldSpawnJumpDustOnLanding = true;
     }
