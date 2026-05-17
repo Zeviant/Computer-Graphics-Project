@@ -12,7 +12,7 @@ GameObject:
   m_Layer: 0
   m_Name: Point B
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 989173921950257076}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.29, y: 0, z: 0}
+  m_LocalPosition: {x: 2.4, y: 0, z: 14.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -113,7 +113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   pointA: {fileID: 4413429090430986319}
   pointB: {fileID: 3360109082477692195}
-  speed: 4
+  speed: 6
   waitTime: 0.2
 --- !u!1 &8455598015464467717
 GameObject:
@@ -253,7 +253,7 @@ GameObject:
   m_Layer: 0
   m_Name: Point A
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -266,7 +266,7 @@ Transform:
   m_GameObject: {fileID: 8725054884164893512}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.62, y: 0, z: 0}
+  m_LocalPosition: {x: 2.4, y: -0, z: 0.808}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -355,4 +355,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   rotationAxis: {x: 0, y: 0, z: 1}
-  rotationSpeed: 720
+  rotationSpeed: 360

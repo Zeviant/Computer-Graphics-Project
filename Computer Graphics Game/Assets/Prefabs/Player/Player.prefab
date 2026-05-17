@@ -75,13 +75,13 @@ MonoBehaviour:
   perfectBhopWindow: 0.08
   greatBhopWindow: 0.11
   normalBhopWindow: 0.15
-  perfectBhopSpeed: 17
-  greatBhopSpeed: 16
-  normalBhopSpeed: 15
+  perfectBhopSpeed: 20
+  greatBhopSpeed: 19
+  normalBhopSpeed: 18
   bhopDecayRate: 1
   bhopSharpTurnCancelAngle: 120
   bhopLandingDust: {fileID: 357616172839661441, guid: 925dc1d67ac446f4d9a58e0586d5caae, type: 3}
-  doubleJumpEffect: {fileID: 4891440538664600065, guid: 82066d902ed0dd6488ddfd32eb994801, type: 3}
+  doubleJumpEffect: {fileID: 4891440538664600065, guid: 091d7eab40d7ad445a592f4df0de7558, type: 3}
   doubleJumpEffectOffset: {x: 0, y: -1, z: -0.2}
   dustGroundOffset: 0.25
   wallJumpSpeed: 12

@@ -5136,6 +5136,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spring
       objectReference: {fileID: 0}
+    - target: {fileID: 4028842930597045964, guid: 2dd2be074e84a7f4997aebd1e4e46892, type: 3}
+      propertyPath: springParticles
+      value: 
+      objectReference: {fileID: 4891440538664600065, guid: 82066d902ed0dd6488ddfd32eb994801, type: 3}
+    - target: {fileID: 4028842930597045964, guid: 2dd2be074e84a7f4997aebd1e4e46892, type: 3}
+      propertyPath: springParticlePrefab
+      value: 
+      objectReference: {fileID: 4891440538664600065, guid: 82066d902ed0dd6488ddfd32eb994801, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5254,6 +5262,10 @@ PrefabInstance:
       propertyPath: velocityText
       value: 
       objectReference: {fileID: 919777660}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: doubleJumpEffect
+      value: 
+      objectReference: {fileID: 5790582615293621133, guid: cd83d7196a7786e4e808b0e4cd9ed426, type: 3}
     - target: {fileID: 2939630109307430014, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: m_Name
       value: Player
