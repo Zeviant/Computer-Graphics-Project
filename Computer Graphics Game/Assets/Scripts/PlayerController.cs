@@ -854,7 +854,10 @@ public class PlayerController : MonoBehaviour
     }
 
     // --- Public Helpers ---
-
+    public void RecoverDoubleJump()
+    {
+        hasDoubleJump = true;
+    }
     public void ResetVelocity()
     {
         playerVelocity = Vector3.zero;
