@@ -29,6 +29,9 @@ public class FinishLine : MonoBehaviour
     [SerializeField] private float delayedActionTime = 3f;
     [SerializeField] private UnityEvent onDelayedFinishAction;
 
+    [Header("HUD")]
+    [SerializeField] private HUDController hudController;
+
     [Header("Settings")]
     [SerializeField] private bool triggerOnlyOnce = true;
 
@@ -46,6 +49,9 @@ public class FinishLine : MonoBehaviour
 
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
+
+        if (hudController == null)
+            hudController = FindFirstObjectByType<HUDController>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -66,6 +72,7 @@ public class FinishLine : MonoBehaviour
 
         hasFinished = true;
 
+        hudController?.StopTimer();
         LockAndStopPlayer(player);
         PlayFinishSound();
         StartFinishCameraMove();
