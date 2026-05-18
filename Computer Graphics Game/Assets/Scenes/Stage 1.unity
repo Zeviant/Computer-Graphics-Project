@@ -10588,7 +10588,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6d4b9baffd11ab24cb435bc45f761abc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -828.4001
+      value: -825.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6d4b9baffd11ab24cb435bc45f761abc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10890,7 +10890,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6d4b9baffd11ab24cb435bc45f761abc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -784.4
+      value: -781.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6d4b9baffd11ab24cb435bc45f761abc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11459,7 +11459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6d4b9baffd11ab24cb435bc45f761abc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -746.4
+      value: -740.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6d4b9baffd11ab24cb435bc45f761abc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12641,9 +12641,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 888076988}
     - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: maxBhopSpeed
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: velocityText
       value: 
       objectReference: {fileID: 919777660}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: bhopDecayRate
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: greatBhopSpeed
       value: 17
@@ -12655,6 +12663,10 @@ PrefabInstance:
     - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: perfectBhopSpeed
       value: 17.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: doubleJumpGroundMask.m_Bits
+      value: 499
       objectReference: {fileID: 0}
     - target: {fileID: 2939630109307430014, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: m_Name

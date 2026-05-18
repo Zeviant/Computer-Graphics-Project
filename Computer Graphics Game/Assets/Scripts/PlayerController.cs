@@ -44,9 +44,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float perfectBhopWindow = 0.04f;
     [SerializeField] private float greatBhopWindow = 0.10f;
     [SerializeField] private float normalBhopWindow = 0.15f;
-    [SerializeField] private float perfectBhopSpeed = 20f;
-    [SerializeField] private float greatBhopSpeed = 17f;
+
     [SerializeField] private float normalBhopSpeed = 15f;
+    [SerializeField] private float maxBhopSpeed = 20f;
+    [SerializeField] private float perfectBhopSpeedGain = 1f;
+    [SerializeField] private float greatBhopSpeedGain = 0.5f;
+
     [SerializeField] private float bhopDecayRate = 10f;
     [SerializeField] private float bhopSharpTurnCancelAngle = 120f;
 
@@ -562,7 +565,8 @@ public class PlayerController : MonoBehaviour
             horizontalMomentum = transform.forward * normalBhopSpeed;
 
         bhopDirection = horizontalMomentum.normalized;
-        bhopCurrentSpeed = GetBhopSpeedFromTiming();
+        bhopCurrentSpeed = GetAccumulatedBhopSpeed(horizontalMomentum.magnitude);
+
         isBhopActive = true;
         canBhopFromSlideJump = true;
         clearMomentumOnGround = false;
@@ -576,19 +580,21 @@ public class PlayerController : MonoBehaviour
         shouldSpawnJumpDustOnLanding = true;
     }
 
-    private float GetBhopSpeedFromTiming()
+    private float GetAccumulatedBhopSpeed(float currentSpeed)
     {
         float timingError = jumpWasBufferedBeforeLanding
             ? Time.time - lastJumpPressedTime
             : landingTimer;
 
+        currentSpeed = Mathf.Max(currentSpeed, normalBhopSpeed);
+
         if (timingError <= perfectBhopWindow)
-            return perfectBhopSpeed;
+            return Mathf.Min(currentSpeed + perfectBhopSpeedGain, maxBhopSpeed);
 
         if (timingError <= greatBhopWindow)
-            return greatBhopSpeed;
+            return Mathf.Min(currentSpeed + greatBhopSpeedGain, maxBhopSpeed);
 
-        return normalBhopSpeed;
+        return currentSpeed;
     }
 
     private void HandleSlideJumpMomentum()
