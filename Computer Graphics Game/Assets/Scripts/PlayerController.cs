@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float greatBhopSpeedGain = 0.5f;
 
     [SerializeField] private float bhopDecayRate = 10f;
-    [SerializeField] private float bhopSharpTurnCancelAngle = 120f;
+    [SerializeField] private float bhopSharpTurnCancelAngle = 360f;
 
     [Header("Jump Effects")]
     [SerializeField] private ParticleSystem bhopLandingDust;
@@ -667,12 +667,7 @@ public class PlayerController : MonoBehaviour
             ? bhopCurrentSpeed
             : slideJumpMomentum.magnitude;
 
-        Vector3 steeredDirection = Vector3.RotateTowards(
-            currentDirection,
-            worldInputDir,
-            airSteerStrength * Mathf.Deg2Rad * Time.deltaTime,
-            0f
-        ).normalized;
+        Vector3 steeredDirection = worldInputDir;
 
         if (isBhopActive)
         {
@@ -942,11 +937,14 @@ public class PlayerController : MonoBehaviour
         jumpConsumedThisFrame = false;
     }
 
-    public void Launch(Vector3 direction, float force)
+    public void Launch(Vector3 direction, float force, bool cancelBhop)
     {
         direction = direction.normalized;
 
-        ClearBhopChain();
+        if (cancelBhop)
+        {
+            ClearBhopChain();
+        }
 
         externalLaunchTimer = ExternalLaunchGraceTime;
 

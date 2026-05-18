@@ -6,6 +6,7 @@ public class SpringPad : MonoBehaviour
     [SerializeField] private float launchForce = 18f;
     [SerializeField] private bool usePadDirection = false;
     [SerializeField] private Transform launchDirection;
+    [SerializeField] private bool cancelPlayerMomentum = false;
 
     [Header("Double Jump")]
     [SerializeField] private bool recoverDoubleJump = true;
@@ -33,7 +34,7 @@ public class SpringPad : MonoBehaviour
 
         Vector3 direction = GetLaunchDirection();
 
-        player.Launch(direction, launchForce);
+        player.Launch(direction, launchForce, cancelPlayerMomentum);
 
         PlaySound();
         PlayParticles();
