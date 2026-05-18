@@ -1,9 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ui:UXML
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ui="UnityEngine.UIElements"
-    xmlns:uie="UnityEditor.UIElements"
-    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
->
-    
+<?xml version="1.0"?>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+  <Style src="project://database/Assets/UI/USS/StageFinished_styles.uss?fileID=7433441132597879392&amp;guid=8570cc05fba90482584b0bf3c8129383&amp;type=3#StageFinished_styles"/>
+  <ui:VisualElement class="root">
+    <ui:VisualElement class="container">
+      <ui:Label class="text title" text="Congratulations!"/>
+      <ui:VisualElement class="time_container">
+        <ui:Label class="text current_time" text="Time: 00:00.00"/>
+        <ui:Label class="text pb_text" text="New PB!"/>
+      </ui:VisualElement>
+      <ui:Label class="text pb_time" text="PB: 00:00.00"/>
+      <ui:VisualElement class="buttons_container">
+        <ui:Button name="leaderboard-btn" class="button" text="Leaderboard"/>
+        <ui:Button name="retry-btn" class="button" text="Retry"/>
+        <ui:Button name="exit-btn" class="button" text="Exit"/>
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
 </ui:UXML>

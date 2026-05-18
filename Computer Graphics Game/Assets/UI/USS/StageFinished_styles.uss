@@ -1,0 +1,64 @@
+* {
+  -unity-font: url("project://database/Assets/UI/Fonts/AldotheApache.ttf");
+  -unity-font-definition: initial;
+}
+
+/* ── Root ── */
+.root {
+  padding: 30px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.text {
+  color: white;
+  font-size: 40px;
+}
+
+.pb_time {
+}
+
+.time_container {
+  margin-top: 60px;
+  position: relative;
+}
+
+.current_time {
+  font-size: 60px;
+}
+
+.button {
+  border: none;
+  font-size: 40px;
+}
+
+.pb_text {
+  top: 0;
+  right: 0;
+  translate: 60% -70%;
+  position: absolute;
+  color: yellow;
+  rotate: 20deg;
+}
+
+.title {
+  padding-top: 30px;
+  font-size: 70px;
+}
+
+.buttons_container {
+  padding-top: 50px;
+}

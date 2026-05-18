@@ -112,9 +112,10 @@ public class HUDController : MonoBehaviour
         streakLabel.style.textShadow = StyleKeyword.Null;
     }
 
-    public void StartTimer() => isRunning = true;
-    public void StopTimer()  => isRunning = false;
-    public void ResetTimer() => elapsedTime = 0f;
+    public void StartTimer()      => isRunning = true;
+    public void StopTimer()       => isRunning = false;
+    public void ResetTimer()      => elapsedTime = 0f;
+    public float GetElapsedTime() => elapsedTime;
 
     private string FormatTime(float t)
     {

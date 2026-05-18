@@ -31,6 +31,11 @@ public class FinishLine : MonoBehaviour
 
     [Header("HUD")]
     [SerializeField] private HUDController hudController;
+    [SerializeField] private StageFinishedController stageFinishedController;
+    [SerializeField] private float stageFinishedDelay = 2f;
+
+    [Header("Pause")]
+    [SerializeField] private PauseMenuController pauseMenuController;
 
     [Header("Settings")]
     [SerializeField] private bool triggerOnlyOnce = true;
@@ -52,6 +57,12 @@ public class FinishLine : MonoBehaviour
 
         if (hudController == null)
             hudController = FindFirstObjectByType<HUDController>();
+
+        if (stageFinishedController == null)
+            stageFinishedController = FindFirstObjectByType<StageFinishedController>();
+
+        if (pauseMenuController == null)
+            pauseMenuController = FindFirstObjectByType<PauseMenuController>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -73,11 +84,13 @@ public class FinishLine : MonoBehaviour
         hasFinished = true;
 
         hudController?.StopTimer();
+        pauseMenuController?.DisablePause();
         LockAndStopPlayer(player);
         PlayFinishSound();
         StartFinishCameraMove();
         SpawnFinishParticles();
         StartDelayedAction();
+        StartCoroutine(ShowStageFinishedAfterDelay());
     }
 
     private void LockAndStopPlayer(PlayerController player)
@@ -187,5 +200,12 @@ public class FinishLine : MonoBehaviour
     private void OnDelayedFinishAction()
     {
         // palbo
+    }
+
+    private IEnumerator ShowStageFinishedAfterDelay()
+    {
+        float currentTime = hudController != null ? hudController.GetElapsedTime() : 0f;
+        yield return new WaitForSeconds(stageFinishedDelay);
+        stageFinishedController?.Show(currentTime);
     }
 }

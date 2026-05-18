@@ -7,6 +7,7 @@ public class PauseMenuController : MonoBehaviour
 {
     private VisualElement _pausePanel;
     private bool _isPaused;
+    private bool _finished;
     private PlayerController _player;
     private CameraController _camera;
 
@@ -53,8 +54,11 @@ public class PauseMenuController : MonoBehaviour
         }
     }
 
+    public void DisablePause() => _finished = true;
+
     private void TogglePause()
     {
+        if (_finished) return;
         if (_isPaused) ClosePauseMenu();
         else OpenPauseMenu();
     }
