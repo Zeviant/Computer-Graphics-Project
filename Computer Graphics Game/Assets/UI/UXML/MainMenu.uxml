@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+  <Style src="project://database/Assets/UI/USS/styles.uss?fileID=7433441132597879392&amp;guid=f6d60fd4e1f5b4f61a1aa42f2f13043f&amp;type=3#styles"/>
+  <ui:VisualElement class="root">
+    <ui:VisualElement class="banner-container">
+      <ui:VisualElement class="banner-img" style="background-image: url('project://database/Assets/UI/imgs/banner.png')"/>
+    </ui:VisualElement>
+    <ui:VisualElement name="main-menu" class="container">
+      <ui:VisualElement class="buttons-container">
+        <ui:Button name="play-btn" text="Play" class="button play"/>
+        <ui:Button text="Shop" class="button shop"/>
+        <ui:Button name="settings-btn" text="Settings" class="button settings"/>
+        <ui:Button name="exit-btn" text="Exit" class="button exit"/>
+      </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="level-select-panel" class="level-select-panel panel">
+      <ui:VisualElement class="level-list-panel">
+        <ui:Button class="button back-btn">
+          <ui:Image class="return-img" style="--unity-image: url('project://database/Assets/UI/imgs/return-button.png')"/>
+        </ui:Button>
+        <ui:Label text="Select Level" class="panel-title"/>
+        <ui:Button name="level-btn-0" text="Level 1" class="button level-btn"/>
+        <ui:Button name="level-btn-1" text="Level 2" class="button level-btn"/>
+        <ui:Button name="level-btn-2" text="Level 3" class="button level-btn"/>
+      </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="settings-panel" class="settings-panel panel">
+      <ui:VisualElement class="level-list-panel">
+        <ui:Button class="button back-btn">
+          <ui:Image class="return-img" style="--unity-image: url('project://database/Assets/UI/imgs/return-button.png')"/>
+        </ui:Button>
+        <ui:Label text="Settings" class="panel-title"/>
+        <ui:VisualElement class="volume-row">
+          <ui:Label text="Master Volume" class="volume-label"/>
+          <ui:VisualElement class="volume-container">
+            <ui:Button name="master-mute-btn" class="mute-btn">
+              <ui:Image name="master-unmuted-icon" class="mute-icon" style="--unity-image: url('project://database/Assets/UI/imgs/unmuted.svg')"/>
+              <ui:Image name="master-muted-icon" class="mute-icon" style="--unity-image: url('project://database/Assets/UI/imgs/muted.svg'); display: none;"/>
+            </ui:Button>
+            <ui:Slider name="master-volume-slider" low-value="0" high-value="1" value="1" class="volume-slider"/>
+            <ui:Label name="master-volume-pct" text="100%" class="volume-pct"/>
+          </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="volume-row">
+          <ui:Label text="Music" class="volume-label"/>
+          <ui:VisualElement class="volume-container">
+            <ui:Button name="music-mute-btn" class="mute-btn">
+              <ui:Image name="music-unmuted-icon" class="mute-icon" style="--unity-image: url('project://database/Assets/UI/imgs/unmuted.svg')"/>
+              <ui:Image name="music-muted-icon" class="mute-icon" style="--unity-image: url('project://database/Assets/UI/imgs/muted.svg'); display: none;"/>
+            </ui:Button>
+            <ui:Slider name="music-volume-slider" low-value="0" high-value="1" value="1" class="volume-slider"/>
+            <ui:Label name="music-volume-pct" text="100%" class="volume-pct"/>
+          </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="volume-row">
+          <ui:Label text="Sound" class="volume-label"/>
+          <ui:VisualElement class="volume-container">
+            <ui:Button name="sound-mute-btn" class="mute-btn">
+              <ui:Image name="sound-unmuted-icon" class="mute-icon" style="--unity-image: url('project://database/Assets/UI/imgs/unmuted.svg')"/>
+              <ui:Image name="sound-muted-icon" class="mute-icon" style="--unity-image: url('project://database/Assets/UI/imgs/muted.svg'); display: none;"/>
+            </ui:Button>
+            <ui:Slider name="sound-volume-slider" low-value="0" high-value="1" value="1" class="volume-slider"/>
+            <ui:Label name="sound-volume-pct" text="100%" class="volume-pct"/>
+          </ui:VisualElement>
+        </ui:VisualElement>
+      </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement class="level-info-panel">
+      <ui:VisualElement class="preview-image-container">
+        <ui:VisualElement name="preview-image" class="preview-image"/>
+      </ui:VisualElement>
+      <ui:VisualElement name="level-stats" class="level-stats">
+        <ui:Label name="best-time-label" text="Best time: --:--" class="stats-label"/>
+        <ui:VisualElement class="stats-buttons">
+          <ui:Button name="leaderboard-btn" text="Leaderboard" class="level-action-button button leaderboard-btn"/>
+          <ui:Button name="play-level-btn" text="Play" class="level-action-button button play-level-btn"/>
+        </ui:VisualElement>
+      </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement class="title-container">
+      <ui:Label text="Veloci" class="title"/>
+      <ui:Label name="title-span" text="Mania" class="title"/>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>
