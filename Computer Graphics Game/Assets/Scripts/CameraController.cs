@@ -22,7 +22,25 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        // Input
+        targetYaw = (targetYaw + lookSpeed * Input.GetAxis("Mouse X") * Time.deltaTime) % 360.0f;
+        targetPitch = Mathf.Clamp(targetPitch + -1.0f * lookSpeed * Input.GetAxis("Mouse Y") * Time.deltaTime, -90.0f, 90.0f);
+
+        // Calculate all targets
+        var targetRotation = Quaternion.Euler(targetPitch, targetYaw, 0.0f);
+        var targetOrigin = player.position;
+
+        currentOrigin = targetOrigin;
+        currentRotation = targetRotation;
+        var currentVector = currentRotation * localOrbitOffset;
+        Ray ray = new(currentOrigin, currentVector.normalized);
+        if (Physics.Raycast(ray, out RaycastHit hit, currentVector.magnitude, cameraCollisionMask, QueryTriggerInteraction.Ignore))
+        {
+            currentVector = (hit.distance * currentVector.normalized) + collisionNormalOffset * hit.normal;
+        }
+
+        transform.position = currentOrigin + currentVector;
+        transform.rotation = currentRotation;
     }
 
     void LateUpdate()
