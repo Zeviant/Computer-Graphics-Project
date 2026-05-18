@@ -12639,47 +12639,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 888076988}
     - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: maxBhopSpeed
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: velocityText
       value: 
       objectReference: {fileID: 919777660}
-    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: bhopDecayRate
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: greatBhopSpeed
-      value: 17
-      objectReference: {fileID: 0}
-    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: normalBhopSpeed
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: perfectBhopSpeed
-      value: 17.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2560575516623999430, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: doubleJumpGroundMask.m_Bits
-      value: 499
-      objectReference: {fileID: 0}
     - target: {fileID: 2939630109307430014, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 3510089434488183823, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: m_SlopeLimit
-      value: 45
-      objectReference: {fileID: 0}
-    - target: {fileID: 6114714303740895589, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8954366888645298005, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
