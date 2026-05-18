@@ -5328,8 +5328,8 @@ MonoBehaviour:
   currentOrigin: {x: 0, y: 0, z: 0}
   currentRotation: {x: 0, y: 0, z: 0, w: 0}
   targetOrigin: {x: 0, y: 0, z: 0}
-  targetYaw: 0
-  targetPitch: 0
+  targetYaw: 220
+  targetPitch: 20
 --- !u!1001 &891123691
 PrefabInstance:
   m_ObjectHideFlags: 0
