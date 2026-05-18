@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+
+public enum BhopQuality { None, Great, Perfect }
 
 public class PlayerController : MonoBehaviour
 {
@@ -25,6 +28,9 @@ public class PlayerController : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] private float doubleJumpSpeed = 6f;
 
+    // This excludes Layer 2, Ignore Raycast.
+    [SerializeField] private LayerMask doubleJumpGroundMask = ~(1 << 2);
+
     [Header("Slide")]
     [SerializeField] private float slideSpeed = 15f;
     [SerializeField] private float slideDuration = 0.5f;
@@ -41,9 +47,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float perfectBhopWindow = 0.04f;
     [SerializeField] private float greatBhopWindow = 0.10f;
     [SerializeField] private float normalBhopWindow = 0.15f;
-    [SerializeField] private float perfectBhopSpeed = 20f;
-    [SerializeField] private float greatBhopSpeed = 17f;
+
     [SerializeField] private float normalBhopSpeed = 15f;
+    [SerializeField] private float maxBhopSpeed = 20f;
+    [SerializeField] private float perfectBhopSpeedGain = 1f;
+    [SerializeField] private float greatBhopSpeedGain = 0.5f;
+
     [SerializeField] private float bhopDecayRate = 10f;
     [SerializeField] private float bhopSharpTurnCancelAngle = 120f;
 
@@ -66,6 +75,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool debugMode = true;
     [SerializeField] private bool showVelocityHUD = true;
 
+    public static event Action<BhopQuality> OnBhopPerformed;
+    public static event Action OnBhopChainBroken;
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip jumpSound;
@@ -74,6 +86,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip slideJumpSound;
     [SerializeField] private AudioClip wallJumpSound;
 
+    public bool InputLocked = false;
     public bool isSliding = false;
 
     private Animator animator;
@@ -95,6 +108,7 @@ public class PlayerController : MonoBehaviour
     private float wallJumpCooldownTimer = 0f;
     private float bhopCurrentSpeed = 0f;
     private float externalLaunchTimer = 0f;
+
     private const float ExternalLaunchGraceTime = 0.12f;
 
     private bool isJumping = false;
@@ -109,6 +123,8 @@ public class PlayerController : MonoBehaviour
     private bool shouldSpawnJumpDustOnLanding = false;
     private bool clearMomentumOnGround = false;
 
+    private bool jumpConsumedThisFrame = false;
+
     private Coroutine slideCoroutine;
     private MoveBetweenAB currentMovingPlatform;
 
@@ -120,19 +136,26 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        HandleJumpBuffer();
-        HandleJumpCut();
+        jumpConsumedThisFrame = false;
+
         ApplyGravity();
         UpdateWallTimers();
-
-        if (!isSliding && wallJumpLockTimer <= 0f)
-            HandleMovement();
-
-        HandleJump();
         CheckWall();
-        HandleWallJump();
-        HandleDoubleJump();
-        HandleSlide();
+
+        if (!InputLocked)
+        {
+            HandleJumpBuffer();
+            HandleJumpCut();
+
+            if (!isSliding && wallJumpLockTimer <= 0f)
+                HandleMovement();
+
+            HandleJump();
+            HandleWallJump();
+            HandleDoubleJump();
+            HandleSlide();
+        }
+
         HandleSlideJumpMomentum();
 
         if (debugMode)
@@ -342,6 +365,8 @@ public class PlayerController : MonoBehaviour
             PerformJump();
         }
 
+        jumpConsumedThisFrame = true;
+
         jumpBufferTimer = 0f;
         jumpWasBufferedBeforeLanding = false;
         isJumping = true;
@@ -388,6 +413,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandleDoubleJump()
     {
+        if (jumpConsumedThisFrame) return;
+
         if (controller.isGrounded) return;
         if (wallJumpLockTimer > 0f) return;
         if (isTouchingWall) return;
@@ -404,6 +431,8 @@ public class PlayerController : MonoBehaviour
         PlayDoubleJumpEffect();
 
         hasDoubleJump = false;
+        jumpConsumedThisFrame = true;
+
         playerVelocity.y = doubleJumpSpeed;
         isJumping = true;
         isFixedHeightJump = true;
@@ -420,7 +449,9 @@ public class PlayerController : MonoBehaviour
             controller.radius,
             Vector3.down,
             out _,
-            checkDistance
+            checkDistance,
+            doubleJumpGroundMask,
+            QueryTriggerInteraction.Ignore
         );
     }
 
@@ -546,7 +577,8 @@ public class PlayerController : MonoBehaviour
             horizontalMomentum = transform.forward * normalBhopSpeed;
 
         bhopDirection = horizontalMomentum.normalized;
-        bhopCurrentSpeed = GetBhopSpeedFromTiming();
+        bhopCurrentSpeed = GetAccumulatedBhopSpeed(horizontalMomentum.magnitude);
+
         isBhopActive = true;
         canBhopFromSlideJump = true;
         clearMomentumOnGround = false;
@@ -560,19 +592,28 @@ public class PlayerController : MonoBehaviour
         shouldSpawnJumpDustOnLanding = true;
     }
 
-    private float GetBhopSpeedFromTiming()
+    private float GetAccumulatedBhopSpeed(float currentSpeed)
     {
         float timingError = jumpWasBufferedBeforeLanding
             ? Time.time - lastJumpPressedTime
             : landingTimer;
 
+        currentSpeed = Mathf.Max(currentSpeed, normalBhopSpeed);
+
         if (timingError <= perfectBhopWindow)
-            return perfectBhopSpeed;
+        {
+            OnBhopPerformed?.Invoke(BhopQuality.Perfect);
+            return Mathf.Min(currentSpeed + perfectBhopSpeedGain, maxBhopSpeed);
+        }
 
         if (timingError <= greatBhopWindow)
-            return greatBhopSpeed;
+        {
+            OnBhopPerformed?.Invoke(BhopQuality.Great);
+            return Mathf.Min(currentSpeed + greatBhopSpeedGain, maxBhopSpeed);
+        }
 
-        return normalBhopSpeed;
+        OnBhopPerformed?.Invoke(BhopQuality.None);
+        return currentSpeed;
     }
 
     private void HandleSlideJumpMomentum()
@@ -667,6 +708,7 @@ public class PlayerController : MonoBehaviour
         ClearBhopState();
         canBhopFromSlideJump = false;
         clearMomentumOnGround = false;
+        OnBhopChainBroken?.Invoke();
     }
 
     private void ClearBhopState()
@@ -725,6 +767,9 @@ public class PlayerController : MonoBehaviour
 
     private void HandleWallJump()
     {
+        if (jumpConsumedThisFrame)
+            return;
+
         if (controller.isGrounded)
         {
             wallJumpBufferTimer = 0f;
@@ -773,6 +818,7 @@ public class PlayerController : MonoBehaviour
         isFixedHeightJump = true;
         hasDoubleJump = true;
         jumpBufferTimer = 0f;
+        jumpConsumedThisFrame = true;
         shouldSpawnJumpDustOnLanding = true;
     }
 
@@ -855,6 +901,13 @@ public class PlayerController : MonoBehaviour
 
     // --- Public Helpers ---
 
+    public float HorizontalSpeed => GetHorizontalMomentum(playerVelocity).magnitude;
+
+    public void RecoverDoubleJump()
+    {
+        hasDoubleJump = true;
+    }
+
     public void ResetVelocity()
     {
         playerVelocity = Vector3.zero;
@@ -886,6 +939,7 @@ public class PlayerController : MonoBehaviour
         canBhopFromSlideJump = false;
         shouldSpawnJumpDustOnLanding = false;
         clearMomentumOnGround = false;
+        jumpConsumedThisFrame = false;
     }
 
     public void Launch(Vector3 direction, float force)
@@ -904,6 +958,7 @@ public class PlayerController : MonoBehaviour
         justLanded = false;
         coyoteTimer = 0f;
         jumpBufferTimer = 0f;
+        jumpConsumedThisFrame = true;
 
         shouldSpawnJumpDustOnLanding = true;
     }

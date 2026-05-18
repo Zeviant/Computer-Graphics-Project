@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+  <Style src="project://database/Assets/UI/USS/HUD_styles.uss?fileID=7433441132597879392&amp;guid=82197644c61d6461fa84590bb022d8ae&amp;type=3#HUD_styles"/>
+  <ui:VisualElement class="root">
+    <ui:VisualElement class="timer-container">
+      <ui:Label text="00:00.00" class="timer"/>
+      <ui:Label text="" class="bhop-streak"/>
+    </ui:VisualElement>
+    <ui:VisualElement class="velocity-container">
+      <ui:Label text="0.0 m/s" class="velocity"/>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

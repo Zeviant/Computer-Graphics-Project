@@ -7,6 +7,9 @@ public class SpringPad : MonoBehaviour
     [SerializeField] private bool usePadDirection = false;
     [SerializeField] private Transform launchDirection;
 
+    [Header("Double Jump")]
+    [SerializeField] private bool recoverDoubleJump = true;
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip springSound;
@@ -24,6 +27,9 @@ public class SpringPad : MonoBehaviour
 
         if (player == null)
             return;
+
+        if (recoverDoubleJump)
+            player.RecoverDoubleJump();
 
         Vector3 direction = GetLaunchDirection();
 
