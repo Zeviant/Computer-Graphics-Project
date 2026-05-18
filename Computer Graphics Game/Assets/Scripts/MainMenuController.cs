@@ -2,12 +2,13 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using Cursor = UnityEngine.Cursor;
 
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private Texture2D[] levelPreviews = new Texture2D[3];
     [SerializeField] private string[] leaderboardUrls = { "", "", "" };
-    [SerializeField] private string[] levelSceneNames = { "Level1", "Level2", "Level3" };
+    [SerializeField] private string[] levelSceneNames = { "Stage 1", "Level2", "Level3" };
     private VisualElement _settingsPanel;
     private VisualElement _levelSelectPanel;
     private VisualElement _levelStats;
@@ -37,8 +38,17 @@ public class MainMenuController : MonoBehaviour
     private Label _musicVolumePct;
     private Label _soundVolumePct;
 
+    private void Update()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
     private void OnEnable()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         var root = GetComponent<UIDocument>().rootVisualElement;
 
         root.Q<Button>("play-btn").clicked += OpenLevelSelect;

@@ -362,3 +362,10 @@
   flex-shrink: 0;
   -unity-text-align: middle-right;
 }
+
+/* ── Pause Menu ── */
+.pause-right-backdrop {
+  width: 50%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}

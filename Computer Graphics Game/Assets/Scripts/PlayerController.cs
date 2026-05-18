@@ -86,6 +86,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip slideJumpSound;
     [SerializeField] private AudioClip wallJumpSound;
 
+    public bool InputLocked = false;
     public bool isSliding = false;
 
     private Animator animator;
@@ -137,19 +138,24 @@ public class PlayerController : MonoBehaviour
     {
         jumpConsumedThisFrame = false;
 
-        HandleJumpBuffer();
-        HandleJumpCut();
         ApplyGravity();
         UpdateWallTimers();
-
-        if (!isSliding && wallJumpLockTimer <= 0f)
-            HandleMovement();
-
-        HandleJump();
         CheckWall();
-        HandleWallJump();
-        HandleDoubleJump();
-        HandleSlide();
+
+        if (!InputLocked)
+        {
+            HandleJumpBuffer();
+            HandleJumpCut();
+
+            if (!isSliding && wallJumpLockTimer <= 0f)
+                HandleMovement();
+
+            HandleJump();
+            HandleWallJump();
+            HandleDoubleJump();
+            HandleSlide();
+        }
+
         HandleSlideJumpMomentum();
 
         if (debugMode)
