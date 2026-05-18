@@ -5317,6 +5317,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   player: {fileID: 1081601414}
+  playerRenderers:
+  - {fileID: 1467235553}
+  - {fileID: 916459072}
   localOrbitOffset: {x: 0, y: 0, z: -5}
   smoothPosition: 0.5
   smoothRotation: 0.9
@@ -5324,9 +5327,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 192
   collisionNormalOffset: 0.3
+  fadeDistance: 2
+  fadeSpeed: 20
   lookSpeed: 200
   currentOrigin: {x: 0, y: 0, z: 0}
   currentRotation: {x: 0, y: 0, z: 0, w: 0}
+  currentPlayerAlpha: 0
   targetOrigin: {x: 0, y: 0, z: 0}
   targetYaw: 220
   targetPitch: 20
@@ -5561,6 +5567,11 @@ MeshCollider:
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2be031c6c7ddbce4ab73f5aac47f3a25, type: 3}
   m_PrefabInstance: {fileID: 913265824}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &916459072 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7710259017388770352, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+  m_PrefabInstance: {fileID: 5154304235180794414}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &919777658
 GameObject:
@@ -9104,6 +9115,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Checkpoint
   pos: {fileID: 1458317926}
+--- !u!23 &1467235553 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 80397611062307069, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+  m_PrefabInstance: {fileID: 5154304235180794414}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1467339904
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13251,6 +13267,18 @@ PrefabInstance:
     - target: {fileID: 2939630109307430014, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7710259017388770352, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7710259017388770352, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8e8ba3f43fb234460aee548e35e833ba, type: 2}
+    - target: {fileID: 8046701483617676893, guid: 4e85ba60a904b450bbf5cdf1165d96b4, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
