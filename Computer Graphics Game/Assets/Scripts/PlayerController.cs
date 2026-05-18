@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviour
     [Header("Double Jump")]
     [SerializeField] private float doubleJumpSpeed = 6f;
 
+    // This excludes Layer 2, Ignore Raycast.
+    [SerializeField] private LayerMask doubleJumpGroundMask = ~(1 << 2);
+
     [Header("Slide")]
     [SerializeField] private float slideSpeed = 15f;
     [SerializeField] private float slideDuration = 0.5f;
@@ -431,7 +434,9 @@ public class PlayerController : MonoBehaviour
             controller.radius,
             Vector3.down,
             out _,
-            checkDistance
+            checkDistance,
+            doubleJumpGroundMask,
+            QueryTriggerInteraction.Ignore
         );
     }
 
