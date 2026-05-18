@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+
+public enum BhopQuality { None, Great, Perfect }
 
 public class PlayerController : MonoBehaviour
 {
@@ -71,6 +74,9 @@ public class PlayerController : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool debugMode = true;
     [SerializeField] private bool showVelocityHUD = true;
+
+    public static event Action<BhopQuality> OnBhopPerformed;
+    public static event Action OnBhopChainBroken;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -589,11 +595,18 @@ public class PlayerController : MonoBehaviour
         currentSpeed = Mathf.Max(currentSpeed, normalBhopSpeed);
 
         if (timingError <= perfectBhopWindow)
+        {
+            OnBhopPerformed?.Invoke(BhopQuality.Perfect);
             return Mathf.Min(currentSpeed + perfectBhopSpeedGain, maxBhopSpeed);
+        }
 
         if (timingError <= greatBhopWindow)
+        {
+            OnBhopPerformed?.Invoke(BhopQuality.Great);
             return Mathf.Min(currentSpeed + greatBhopSpeedGain, maxBhopSpeed);
+        }
 
+        OnBhopPerformed?.Invoke(BhopQuality.None);
         return currentSpeed;
     }
 
@@ -689,6 +702,7 @@ public class PlayerController : MonoBehaviour
         ClearBhopState();
         canBhopFromSlideJump = false;
         clearMomentumOnGround = false;
+        OnBhopChainBroken?.Invoke();
     }
 
     private void ClearBhopState()
@@ -880,6 +894,8 @@ public class PlayerController : MonoBehaviour
     }
 
     // --- Public Helpers ---
+
+    public float HorizontalSpeed => GetHorizontalMomentum(playerVelocity).magnitude;
 
     public void RecoverDoubleJump()
     {

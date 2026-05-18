@@ -1,0 +1,62 @@
+* {
+  -unity-font: url("project://database/Assets/UI/Fonts/AldoTheApache.ttf");
+  -unity-font-definition: initial;
+}
+
+.root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.timer-container {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.velocity-container {
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  border-top-right-radius: 10px;
+}
+
+.velocity {
+  padding: 10px;
+  font-size: 50px;
+  color: white;
+}
+
+.bhop-streak {
+  -unity-text-align: middle-center;
+  font-size: 36px;
+  color: rgb(255, 220, 50);
+  margin-top: 4px;
+  transform-origin: center center;
+  transition-property: scale, color, text-shadow;
+  transition-duration: 0.3s, 0.4s, 0.4s;
+  transition-timing-function: ease-out, ease-out, ease-out;
+  text-shadow: 10px 10px 30px rgba(255, 220, 50, 1);
+}
+
+.bhop-streak--pop {
+  scale: 1.4 1.4;
+  transition-duration: 0s;
+}
+
+.timer {
+  -unity-text-align: middle-center;
+  width: 300px;
+  padding: 10px;
+  margin: 0;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  font-size: 70px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
