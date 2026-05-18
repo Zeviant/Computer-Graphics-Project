@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+
+public enum BhopQuality { None, Great, Perfect }
 
 public class PlayerController : MonoBehaviour
 {
@@ -72,6 +75,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool debugMode = true;
     [SerializeField] private bool showVelocityHUD = true;
 
+    public static event Action<BhopQuality> OnBhopPerformed;
+    public static event Action OnBhopChainBroken;
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip jumpSound;
@@ -80,6 +86,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip slideJumpSound;
     [SerializeField] private AudioClip wallJumpSound;
 
+    public bool InputLocked = false;
     public bool isSliding = false;
 
     private Animator animator;
@@ -131,19 +138,24 @@ public class PlayerController : MonoBehaviour
     {
         jumpConsumedThisFrame = false;
 
-        HandleJumpBuffer();
-        HandleJumpCut();
         ApplyGravity();
         UpdateWallTimers();
-
-        if (!isSliding && wallJumpLockTimer <= 0f)
-            HandleMovement();
-
-        HandleJump();
         CheckWall();
-        HandleWallJump();
-        HandleDoubleJump();
-        HandleSlide();
+
+        if (!InputLocked)
+        {
+            HandleJumpBuffer();
+            HandleJumpCut();
+
+            if (!isSliding && wallJumpLockTimer <= 0f)
+                HandleMovement();
+
+            HandleJump();
+            HandleWallJump();
+            HandleDoubleJump();
+            HandleSlide();
+        }
+
         HandleSlideJumpMomentum();
 
         if (debugMode)
@@ -589,11 +601,18 @@ public class PlayerController : MonoBehaviour
         currentSpeed = Mathf.Max(currentSpeed, normalBhopSpeed);
 
         if (timingError <= perfectBhopWindow)
+        {
+            OnBhopPerformed?.Invoke(BhopQuality.Perfect);
             return Mathf.Min(currentSpeed + perfectBhopSpeedGain, maxBhopSpeed);
+        }
 
         if (timingError <= greatBhopWindow)
+        {
+            OnBhopPerformed?.Invoke(BhopQuality.Great);
             return Mathf.Min(currentSpeed + greatBhopSpeedGain, maxBhopSpeed);
+        }
 
+        OnBhopPerformed?.Invoke(BhopQuality.None);
         return currentSpeed;
     }
 
@@ -689,6 +708,7 @@ public class PlayerController : MonoBehaviour
         ClearBhopState();
         canBhopFromSlideJump = false;
         clearMomentumOnGround = false;
+        OnBhopChainBroken?.Invoke();
     }
 
     private void ClearBhopState()
@@ -880,6 +900,8 @@ public class PlayerController : MonoBehaviour
     }
 
     // --- Public Helpers ---
+
+    public float HorizontalSpeed => GetHorizontalMomentum(playerVelocity).magnitude;
 
     public void RecoverDoubleJump()
     {

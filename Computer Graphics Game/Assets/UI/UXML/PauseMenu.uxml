@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+  <Style src="project://database/Assets/UI/USS/styles.uss?fileID=7433441132597879392&amp;guid=f6d60fd4e1f5b4f61a1aa42f2f13043f&amp;type=3#styles"/>
+  <ui:VisualElement class="root">
+    <ui:VisualElement name="pause-panel" class="panel">
+      <ui:VisualElement class="level-list-panel">
+        <ui:Button class="button back-btn">
+          <ui:Image class="return-img" style="--unity-image: url('project://database/Assets/UI/imgs/return-button.png')"/>
+        </ui:Button>
+        <ui:Button name="restart-btn" text="Restart Stage" class="button"/>
+        <ui:Button name="mainmenu-btn" text="Main Menu" class="button"/>
+      </ui:VisualElement>
+      <ui:VisualElement class="pause-right-backdrop"/>
+      <ui:VisualElement class="title-container">
+        <ui:Label text="Veloci" class="title"/>
+        <ui:Label name="title-span" text="Mania" class="title"/>
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

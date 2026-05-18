@@ -1,0 +1,371 @@
+:root {
+  --color-button: rgb(188, 188, 188);
+  --color-background: rgb(255, 255, 255);
+  --color-foreground: rgba(0, 0, 0, 0.8);
+  --color-transparent: rgba(0, 0, 0, 0);
+  --color-text-primary: black;
+  --color-text-on-accent: white;
+  --color-text-active: rgb(220, 220, 220);
+  --color-active: rgb(220, 0, 0);
+  --color-accent: rgb(255, 0, 0);
+  --color-accent-hover: rgb(255, 120, 120);
+}
+
+* {
+  -unity-font: url("project://database/Assets/UI/Fonts/AldotheApache.ttf");
+  -unity-font-definition: initial;
+}
+
+/* ── Root ── */
+.root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.banner-container {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  translate: 100% 0;
+}
+
+.banner-img {
+  width: 100%;
+  height: 100%;
+  -unity-background-scale-mode: scale-and-crop;
+}
+
+/* ── Main Menu ── */
+.container {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background-color: var(--color-background);
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 5px;
+  padding-top: 20px;
+}
+
+/* Title — now a direct child of root, positioned over the left half.
+   Placed last in the UXML so it renders above all other elements. */
+.title-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  padding-top: 20px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+#title-span {
+  color: var(--color-text-primary);
+}
+
+.title {
+  width: auto;
+  padding: 0px;
+  margin: 0px;
+  font-size: 80px;
+  color: var(--color-accent);
+}
+
+/* ── Shared button base ── */
+.button {
+  border-width: 0px;
+  font-size: 50px;
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 98%;
+  -unity-text-align: middle-left;
+}
+
+.buttons-container {
+  flex-direction: column;
+  width: 100%;
+}
+
+.button:hover {
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}
+
+.button:active {
+  color: var(--color-text-active);
+  background-color: var(--color-active);
+}
+
+/* ── Level Select Panel ── */
+.panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  flex-direction: row;
+  background-color: var(--color-transparent);
+  translate: -100% 0;
+  transition-property: translate;
+  transition-duration: 500ms;
+  transition-timing-function: ease-out;
+}
+
+.return-img {
+  height: 50px;
+  width: 50px;
+}
+
+.panel-open {
+  translate: 0 0;
+}
+
+/* Left panel — matches main menu container exactly */
+.level-list-panel {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 5px;
+  padding-top: 20px;
+  background-color: var(--color-background);
+}
+
+.panel-title {
+  font-size: 36px;
+  margin-bottom: 20px;
+  padding-left: 5px;
+  color: var(--color-text-primary);
+}
+
+.back-btn:hover .return-img {
+  filter: invert(100%);
+}
+
+.back-btn {
+  position: absolute;
+  top: 0;
+  margin: 20px;
+  left: 0;
+  width: auto;
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: var(--color-accent);
+}
+
+.level-btn {
+  -unity-text-align: middle-left;
+  font-size: 50px;
+  padding: 10px 5px;
+  margin-bottom: 10px;
+  width: 98%;
+}
+
+.level-btn:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.level-btn-selected,
+.level-btn-selected:hover {
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}
+
+/* Right panel — transparent background */
+.level-info-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  translate: 100% 0;
+  width: 50%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--color-transparent);
+}
+
+.preview-image-container {
+  width: 100%;
+  height: 50%;
+}
+
+/* Preview image — top of right panel */
+.preview-image {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+  -unity-background-scale-mode: scale-and-crop;
+}
+
+.preview-image.visible {
+  opacity: 1;
+}
+
+/* Stats — bottom of right panel */
+.level-stats {
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+  opacity: 0;
+  background-color: var(--color-foreground);
+  transition-property: opacity;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+.level-stats.visible {
+  opacity: 1;
+}
+
+.stats-label {
+  font-size: 32px;
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+}
+
+.stats-buttons {
+  flex-direction: column;
+  align-items: center;
+}
+
+.leaderboard-btn,
+.play-level-btn {
+  font-size: 28px;
+  width: auto;
+  padding: 8px 20px;
+  -unity-text-align: middle-center;
+  color: var(--color-text-on-accent);
+  background-color: var(--color-accent);
+}
+
+.leaderboard-btn {
+  margin-right: 10px;
+}
+
+.leaderboard-btn:hover,
+.play-level-btn:hover {
+  background-color: var(--color-active);
+  color: var(--color-text-on-accent);
+}
+
+.level-action-button {
+  font-size: 50px;
+}
+
+#best-time-label {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  font-size: 50px;
+  color: var(--color-background);
+}
+
+/* ── Settings Panel — Volume Controls ── */
+.volume-row {
+  background-color: var(--color-button);
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 5px;
+  width: 98%;
+  margin-left: 5px;
+  margin-bottom: 18px;
+}
+
+.volume-label {
+  padding-left: 10px;
+  font-size: 45px;
+  color: var(--color-text-primary);
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.mute-btn:hover .mute-icon {
+  filter: invert(100%);
+}
+
+.volume-container {
+  width: 100%;
+  margin-left: 30px;
+  padding-left: 20px;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.volume-slider {
+  max-width: 400px;
+  width: 80%;
+}
+
+.volume-slider .unity-base-slider__tracker {
+  background-color: var(--color-background);
+  border-width: 0;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.volume-slider .unity-base-slider__dragger {
+  background-color: var(--color-accent);
+  border-width: 0;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+}
+
+.volume-slider .unity-base-slider__dragger-border {
+  border-width: 0;
+}
+
+.mute-btn {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  padding: 4px;
+  border-width: 0;
+  background-color: transparent;
+  align-items: center;
+  justify-content: center;
+}
+
+.mute-btn:hover {
+  background-color: var(--color-accent);
+}
+
+.mute-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.volume-pct {
+  font-size: 28px;
+  color: var(--color-text-primary);
+  width: 55px;
+  flex-shrink: 0;
+  -unity-text-align: middle-right;
+}
+
+/* ── Pause Menu ── */
+.pause-right-backdrop {
+  width: 50%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
