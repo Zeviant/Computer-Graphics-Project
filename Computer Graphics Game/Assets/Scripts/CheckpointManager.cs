@@ -24,23 +24,53 @@ public class CheckpointManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Duplicate CheckpointManager found. Destroying duplicate: " + name);
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
 
         if (defaultSpawnPoint != null)
         {
             currentSpawnPosition = defaultSpawnPoint.position;
             currentSpawnRotation = defaultSpawnPoint.rotation;
+
+            Debug.Log("Default spawn set to: " + currentSpawnPosition);
+        }
+        else
+        {
+            currentSpawnPosition = Vector3.zero;
+            currentSpawnRotation = Quaternion.identity;
+
+            Debug.LogWarning("CheckpointManager has no default spawn point assigned. Using world origin.");
         }
     }
 
     public void SetCheckpoint(Transform checkpoint)
     {
+        if (checkpoint == null)
+        {
+            Debug.LogWarning("Tried to set checkpoint, but checkpoint Transform was null.");
+            return;
+        }
+
         currentSpawnPosition = checkpoint.position;
         currentSpawnRotation = checkpoint.rotation;
+
+        Debug.Log("Checkpoint set to: " + checkpoint.name + " at " + currentSpawnPosition);
     }
 
     public void Respawn(GameObject player)
     {
+        if (player == null)
+        {
+            Debug.LogWarning("Respawn called, but player was null.");
+            return;
+        }
+
         if (isRespawning)
             return;
 
@@ -58,18 +88,17 @@ public class CheckpointManager : MonoBehaviour
         if (playerController != null)
             playerController.enabled = false;
 
-        // Disintegrate at current position
         PlayPoofSound();
         PlayParticles(player.transform.position);
 
-        // Hide player while waiting to respawn
         SetRenderersEnabled(renderers, false);
 
         yield return new WaitForSeconds(respawnDelay);
 
-        // Teleport player to checkpoint
         if (controller != null)
             controller.enabled = false;
+
+        Debug.Log("Respawning player to: " + currentSpawnPosition);
 
         player.transform.SetPositionAndRotation(currentSpawnPosition, currentSpawnRotation);
 
@@ -79,7 +108,6 @@ public class CheckpointManager : MonoBehaviour
         if (controller != null)
             controller.enabled = true;
 
-        // Reappear at checkpoint
         PlayParticles(player.transform.position);
         SetRenderersEnabled(renderers, true);
 
@@ -117,7 +145,8 @@ public class CheckpointManager : MonoBehaviour
     {
         foreach (Renderer renderer in renderers)
         {
-            renderer.enabled = enabled;
+            if (renderer != null)
+                renderer.enabled = enabled;
         }
     }
 }

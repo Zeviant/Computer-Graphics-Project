@@ -10,15 +10,24 @@ public class MoveBetweenAB : MonoBehaviour
     private Transform target;
     private float waitTimer;
 
+    public Vector3 DeltaMovement { get; private set; }
+
+    private Vector3 previousPosition;
+
     private void Start()
     {
         target = pointB;
+        previousPosition = transform.position;
     }
 
     private void Update()
     {
+        DeltaMovement = Vector3.zero;
+
         if (pointA == null || pointB == null)
             return;
+
+        previousPosition = transform.position;
 
         if (waitTimer > 0f)
         {
@@ -31,6 +40,8 @@ public class MoveBetweenAB : MonoBehaviour
             target.position,
             speed * Time.deltaTime
         );
+
+        DeltaMovement = transform.position - previousPosition;
 
         if (Vector3.Distance(transform.position, target.position) < 0.05f)
         {

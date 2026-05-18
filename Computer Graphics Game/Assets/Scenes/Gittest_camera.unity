@@ -1834,8 +1834,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
   player: {fileID: 1081601414}
   localOrbitOffset: {x: 0, y: 0, z: -5}
-  smoothPosition: 0.1
-  smoothRotation: 0.1
+  smoothPosition: 0.9
+  smoothRotation: 0.9
   cameraCollisionMask:
     serializedVersion: 2
     m_Bits: 192
