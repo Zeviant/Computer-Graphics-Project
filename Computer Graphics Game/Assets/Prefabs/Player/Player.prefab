@@ -105,6 +105,7 @@ MonoBehaviour:
   slideSound: {fileID: 8300000, guid: 24144183970ec654e9c81df465a2ef78, type: 3}
   slideJumpSound: {fileID: 8300000, guid: 7824f639f63feaa4780dedc93ed436c3, type: 3}
   wallJumpSound: {fileID: 8300000, guid: 59bd4011d47d0844db14bc939ccfeb54, type: 3}
+  InputLocked: 0
   isSliding: 0
 --- !u!143 &3510089434488183823
 CharacterController:
@@ -351,7 +352,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 0a4304f6067564bcaa5f9186d9336c10, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -464,7 +465,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 0a4304f6067564bcaa5f9186d9336c10, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
